@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)https://www.cnblogs.com/wupeiqi/articles/5237704.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="origin">
+<title>Python之路【第十六篇】：Django【基础篇】 - 武沛齐 - 博客园</title>
+<meta property="og:description" content="Python的WEB框架有Django、Tornado、Flask 等多种，Django相较与其他WEB框架其优势为：大而全，框架本身集成了ORM、模型绑定、模板引擎、缓存、Session等诸多功能。">
+<link type="text/css" rel="stylesheet" href="./Django【基础篇】_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./Django【基础篇】_files/bundle-SimpleBlue.css">
+<link type="text/css" rel="stylesheet" href="./Django【基础篇】_files/133379.css">
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./Django【基础篇】_files/bundle-SimpleBlue-mobile.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/wupeiqi/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/wupeiqi/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/wupeiqi/wlwmanifest.xml">
+<script src="./Django【基础篇】_files/f.txt"></script><script src="./Django【基础篇】_files/amp4ads-host-v0.js.下载"></script><script src="./Django【基础篇】_files/pubads_impl_rendering_266.js.下载"></script><script async="" src="./Django【基础篇】_files/analytics.js.下载"></script><script type="text/javascript" src="./Django【基础篇】_files/encoder.js.下载"></script><script src="./Django【基础篇】_files/jquery-2.2.0.min.js.下载"></script><style type="text/css" abt="234"></style>
+<script type="text/javascript">var currentBlogApp = 'wupeiqi', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="./Django【基础篇】_files/blog-common.js.下载" type="text/javascript"></script>
+<link rel="preload" href="./Django【基础篇】_files/f(1).txt" as="script"><script type="text/javascript" src="./Django【基础篇】_files/f(1).txt"></script><script src="./Django【基础篇】_files/pubads_impl_266.js.下载" async=""></script><script>//remove 17173 video ad
+doAdblock();
+function doAdblock(){
+    (function() {
+        function A() {}
+        A.prototype = {
+            rules: {
+                '17173_in':{
+                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFile(Customer)?\.swf/,
+                    'replace':"http://swf.adtchrome.com/17173_in_20150522.swf"
+                },
+                '17173_out':{
+                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFileFirstpage\.swf/,
+                    'replace':"http://swf.adtchrome.com/17173_out_20150522.swf"
+                },
+                '17173_live':{
+                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream(_firstpage)?\.swf/,
+                    'replace':"http://swf.adtchrome.com/17173_stream_20150522.swf"
+                },
+                '17173_live_out':{
+                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream_(custom)?Out\.swf/,
+                    'replace':"http://swf.adtchrome.com/17173.out.Live.swf"
+                }
+            },
+            _done: null,
+            get done() {
+                if(!this._done) {
+                    this._done = new Array();
+                }
+                return this._done;
+            },
+            addAnimations: function() {
+                var style = document.createElement('style');
+                style.type = 'text/css';
+                style.innerHTML = 'object,embed{\
+                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;\
+                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;\
+                -o-animation-duration:.001s;-o-animation-name:playerInserted;\
+                animation-duration:.001s;animation-name:playerInserted;}\
+                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}';
+                document.getElementsByTagName('head')[0].appendChild(style);
+            },
+            animationsHandler: function(e) {
+                if(e.animationName === 'playerInserted') {
+                    this.replace(e.target);
+                }
+            },
+            replace: function(elem) {
+                if(this.done.indexOf(elem) != -1) return;
+                this.done.push(elem);
+                var player = elem.data || elem.src;
+                if(!player) return;
+                var i, find, replace = false;
+                for(i in this.rules) {
+                    find = this.rules[i]['find'];
+                    if(find.test(player)) {
+                        replace = this.rules[i]['replace'];
+                        if('function' === typeof this.rules[i]['preHandle']) {
+                            this.rules[i]['preHandle'].bind(this, elem, find, replace, player)();
+                        }else{
+                            this.reallyReplace.bind(this, elem, find, replace)();
+                        }
+                        break;
+                    }
+                }
+            },
+            reallyReplace: function(elem, find, replace) {
+                elem.data && (elem.data = elem.data.replace(find, replace)) || elem.src && ((elem.src = elem.src.replace(find, replace)) && (elem.style.display = 'block'));
+                var b = elem.querySelector("param[name='movie']");
+                this.reloadPlugin(elem);
+            },
+            reloadPlugin: function(elem) {
+                var nextSibling = elem.nextSibling;
+                var parentNode = elem.parentNode;
+                parentNode.removeChild(elem);
+                var newElem = elem.cloneNode(true);
+                this.done.push(newElem);
+                if(nextSibling) {
+                    parentNode.insertBefore(newElem, nextSibling);
+                } else {
+                    parentNode.appendChild(newElem);
+                }
+            },
+            init: function() {
+                var handler = this.animationsHandler.bind(this);
+                document.body.addEventListener('webkitAnimationStart', handler, false);
+                document.body.addEventListener('msAnimationStart', handler, false);
+                document.body.addEventListener('oAnimationStart', handler, false);
+                document.body.addEventListener('animationstart', handler, false);
+                this.addAnimations();
+            }
+        };
+        new A().init();
+    })();
+}
+//remove baidu search ad
+if(document.URL.indexOf('www.baidu.com') >= 0){
+    if(document && document.getElementsByTagName && document.getElementById && document.body){
+        var aa = function(){
+            var all = document.body.querySelectorAll("#content_left div,#content_left table");
+            for(var i = 0; i < all.length; i++){
+                if(/display:\s?(table|block)\s!important/.test(all[i].getAttribute("style"))){all[i].style.display= "none";all[i].style.visibility='hidden';}
+            }
+            all = document.body.querySelectorAll('.result.c-container[id="1"]');
+            //if(all.length == 1) return;
+            for(var i = 0; i < all.length; i++){
+                if(all[i].innerHTML && all[i].innerHTML.indexOf('广告')>-1){
+                    all[i].style.display= "none";all[i].style.visibility='hidden';
+                }
+            }
+        }
+        aa();
+        document.getElementById('wrapper_wrapper').addEventListener('DOMSubtreeModified',aa)
+    };
+}
+//remove sohu video ad
+if (document.URL.indexOf("tv.sohu.com") >= 0){
+    if (document.cookie.indexOf("fee_status=true")==-1){document.cookie='fee_status=true'};
+}
+//remove 56.com video ad
+if (document.URL.indexOf("56.com") >= 0){
+    if (document.cookie.indexOf("fee_status=true")==-1){document.cookie='fee_status=true'};
+}
+//fore iqiyi enable html5 player function
+if (document.URL.indexOf("iqiyi.com") >= 0){
+    if (document.cookie.indexOf("player_forcedType=h5_VOD")==-1){
+        document.cookie='player_forcedType=h5_VOD'
+        if(localStorage.reloadTime && Date.now() - parseInt(localStorage.reloadTime)<60000){
+            console.log('no reload')
+        }else{
+            location.reload()
+            localStorage.reloadTime = Date.now();
+        }
+    }
+}
+</script><style type="text/css">object,embed{                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;                -o-animation-duration:.001s;-o-animation-name:playerInserted;                animation-duration:.001s;animation-name:playerInserted;}                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}</style><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-30/html/container.html"></head>
+<body>
+<a name="top"></a>
+
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+		
+<!--done-->
+<div class="title"><a id="Header1_HeaderTitle" class="headermaintitle" href="https://www.cnblogs.com/wupeiqi/">Mr.Seven</a></div>
+<div class="subtitle"></div>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li id="nav_sitehome"><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">博客园</a></li>
+<li id="nav_myhome"><a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/wupeiqi/">首页</a></li>
+<li id="nav_newpost"><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li id="nav_contact"><a id="blog_nav_contact" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/%E6%AD%A6%E6%B2%9B%E9%BD%90">联系</a></li>
+<li id="nav_rss"><a id="blog_nav_rss" class="menu" href="https://www.cnblogs.com/wupeiqi/rss">订阅</a>
+<!--<a id="blog_nav_rss_image" class="aHeaderXML" href="https://www.cnblogs.com/wupeiqi/rss"><img src="//www.cnblogs.com/images/xml.gif" alt="订阅" /></a>--></li>
+<li id="nav_admin"><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+</ul>
+
+		<div class="blogStats">
+			
+			<div id="blog_stats">
+<!--done-->
+随笔-133&nbsp;
+文章-159&nbsp;
+评论-621&nbsp;
+</div>
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="https://www.cnblogs.com/wupeiqi/articles/5237704.html">Python之路【第十六篇】：Django【基础篇】</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body" class="blogpost-body"><p><span style="font-size: 14pt;">P</span>ython的WEB框架有Django、Tornado、Flask 等多种，Django相较与其他WEB框架其优势为：大而全，框架本身集成了ORM、模型绑定、模板引擎、缓存、Session等诸多功能。</p>
+<h3>基本配置</h3>
+<p><strong>一、创建django程序</strong></p>
+<ul>
+<li>终端命令：django-admin startproject sitename</li>
+<li>IDE创建Django程序时，本质上都是自动执行上述命令</li>
+</ul>
+<p><span style="color: #888888;">其他常用命令：</span></p>
+<p><span style="color: #888888;">　　python manage.py runserver 0.0.0.0</span><br><span style="color: #888888;">　　python manage.py startapp appname</span><br><span style="color: #888888;">　　python manage.py syncdb</span><br><span style="color: #888888;">　　python manage.py makemigrations</span><br><span style="color: #888888;">　　python manage.py migrate</span></p>
+<p><span style="color: #888888;">　　python manage.py createsuperuser</span></p>
+<p><strong>二、程序目录</strong></p>
+<p><img src="./Django【基础篇】_files/425762-20160306052708955-2108919642.png" alt="" width="363" height="187"></p>
+<p><strong>三、配置文件</strong></p>
+<p>1、数据库</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_270520" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">DATABASES </code><code class="python keyword">=</code> <code class="python plain">{</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'default'</code><code class="python plain">: {</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'ENGINE'</code><code class="python plain">: </code><code class="python string">'django.db.backends.mysql'</code><code class="python plain">,</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'NAME'</code><code class="python plain">:</code><code class="python string">'dbname'</code><code class="python plain">,</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'USER'</code><code class="python plain">: </code><code class="python string">'root'</code><code class="python plain">,</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'PASSWORD'</code><code class="python plain">: </code><code class="python string">'xxx'</code><code class="python plain">,</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'HOST'</code><code class="python plain">: '',</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'PORT'</code><code class="python plain">: '',</code></div><div class="line number9 index8 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">}</code></div><div class="line number10 index9 alt1"><code class="python plain">}</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_748630" class="syntaxhighlighter collapsed  javascript"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="javascript preprocessor"># 由于Django内部连接MySQL时使用的是MySQLdb模块，而python3中还无此模块，所以需要使用pymysql来代替</code></div><div class="line number2 index1 alt1"><code class="javascript spaces">&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="javascript preprocessor"># 如下设置放置的与project同名的配置的 __init__.py文件中</code></div><div class="line number4 index3 alt1"><code class="javascript spaces">&nbsp;</code>&nbsp;</div><div class="line number5 index4 alt2"><code class="javascript keyword">import</code> <code class="javascript plain">pymysql</code></div><div class="line number6 index5 alt1"><code class="javascript plain">pymysql.install_as_MySQLdb()　</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>2、模版</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_32107" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">TEMPLATE_DIRS </code><code class="python keyword">=</code> <code class="python plain">(</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">os.path.join(BASE_DIR,</code><code class="python string">'templates'</code><code class="python plain">),</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>3、静态文件</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_313699" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">STATICFILES_DIRS </code><code class="python keyword">=</code> <code class="python plain">(</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">os.path.join(BASE_DIR,</code><code class="python string">'static'</code><code class="python plain">),</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<h3>路由系统</h3>
+<p><strong>1、单一路由对应</strong></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_712489" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^index$'</code><code class="python plain">, views.index),</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>2、基于正则的路由</strong></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_806724" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^index/(\d*)'</code><code class="python plain">, views.index),</code></div><div class="line number2 index1 alt1"><code class="python plain">url(r</code><code class="python string">'^manage/(?P&lt;name&gt;\w*)/(?P&lt;id&gt;\d*)'</code><code class="python plain">, views.manage),</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>3、添加额外的参数</strong></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_235922" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^manage/(?P&lt;name&gt;\w*)'</code><code class="python plain">, views.manage,{</code><code class="python string">'id'</code><code class="python plain">:</code><code class="python value">333</code><code class="python plain">}),</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>4、为路由映射设置名称</strong></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_559165" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^home'</code><code class="python plain">, views.home, name</code><code class="python keyword">=</code><code class="python string">'h1'</code><code class="python plain">),</code></div><div class="line number2 index1 alt1"><code class="python plain">url(r</code><code class="python string">'^index/(\d*)'</code><code class="python plain">, views.index, name</code><code class="python keyword">=</code><code class="python string">'h2'</code><code class="python plain">),</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>设置名称之后，可以在不同的地方调用，如：</p>
+<ul>
+<li>模板中使用生成URL &nbsp; &nbsp; {% url 'h2' 2012 %}</li>
+<li>函数中使用生成URL &nbsp; &nbsp;&nbsp;reverse('h2', args=(2012,)) &nbsp; &nbsp; &nbsp;路径:django.urls.reverse</li>
+<li>Model中使用获取URL &nbsp;自定义get_absolute_url() 方法<br>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;2ecbe2f2-692a-4659-82df-6e817afae64e&#39;)"><img id="code_img_closed_2ecbe2f2-692a-4659-82df-6e817afae64e" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_2ecbe2f2-692a-4659-82df-6e817afae64e" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;2ecbe2f2-692a-4659-82df-6e817afae64e&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_2ecbe2f2-692a-4659-82df-6e817afae64e" class="cnblogs_code_hide">
+<pre><span style="color: #0000ff;">class</span><span style="color: #000000;"> NewType(models.Model):
+    caption </span>= models.CharField(max_length=16<span style="color: #000000;">)
+
+
+    </span><span style="color: #0000ff;">def</span><span style="color: #000000;"> get_absolute_url(self):
+        </span><span style="color: #800000;">"""</span><span style="color: #800000;">
+        为每个对象生成一个URL
+        应用：在对象列表中生成查看详细的URL，使用此方法即可！！！
+        :return:
+        </span><span style="color: #800000;">"""</span>
+        <span style="color: #008000;">#</span><span style="color: #008000;"> return '/%s/%s' % (self._meta.db_table, self.id)</span>
+        <span style="color: #008000;">#</span><span style="color: #008000;"> 或</span>
+        <span style="color: #0000ff;">from</span> django.urls <span style="color: #0000ff;">import</span><span style="color: #000000;"> reverse
+        </span><span style="color: #0000ff;">return</span> reverse(<span style="color: #800000;">'</span><span style="color: #800000;">NewType.Detail</span><span style="color: #800000;">'</span>, kwargs={<span style="color: #800000;">'</span><span style="color: #800000;">nid</span><span style="color: #800000;">'</span>: self.id})</pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+</li>
+</ul>
+<p><em><span style="color: #888888;">获取请求匹配成功的URL信息：request.resolver_match</span></em></p>
+<p><strong>5、根据app对路由规则进行分类</strong></p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_743530" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^web/'</code><code class="python plain">,include(</code><code class="python string">'web.urls'</code><code class="python plain">)),</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><strong>6、命名空间</strong></p>
+<p>a. project.urls.py</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_542113" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.conf.urls </code><code class="python keyword">import</code> <code class="python plain">url,include</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="python plain">urlpatterns </code><code class="python keyword">=</code> <code class="python plain">[</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">url(r</code><code class="python string">'^a/'</code><code class="python plain">, include(</code><code class="python string">'app01.urls'</code><code class="python plain">, namespace</code><code class="python keyword">=</code><code class="python string">'author-polls'</code><code class="python plain">)),</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">url(r</code><code class="python string">'^b/'</code><code class="python plain">, include(</code><code class="python string">'app01.urls'</code><code class="python plain">, namespace</code><code class="python keyword">=</code><code class="python string">'publisher-polls'</code><code class="python plain">)),</code></div><div class="line number6 index5 alt1"><code class="python plain">]</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>b. app01.urls.py</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_68045" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.conf.urls </code><code class="python keyword">import</code> <code class="python plain">url</code></div><div class="line number2 index1 alt1"><code class="python keyword">from</code> <code class="python plain">app01 </code><code class="python keyword">import</code> <code class="python plain">views</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="python plain">app_name </code><code class="python keyword">=</code> <code class="python string">'app01'</code></div><div class="line number5 index4 alt2"><code class="python plain">urlpatterns </code><code class="python keyword">=</code> <code class="python plain">[</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">url(r</code><code class="python string">'^(?P&lt;pk&gt;\d+)/$'</code><code class="python plain">, views.detail, name</code><code class="python keyword">=</code><code class="python string">'detail'</code><code class="python plain">)</code></div><div class="line number7 index6 alt2"><code class="python plain">]</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>c. app01.views.py</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_518462" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">def</code> <code class="python plain">detail(request, pk):</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python functions">print</code><code class="python plain">(request.resolver_match)</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">return</code> <code class="python plain">HttpResponse(pk)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>以上定义带命名空间的url之后，使用name生成URL时候，应该如下：</p>
+<ul>
+<li>v = reverse('app01:detail', kwargs={'pk':11})</li>
+<li>{% url 'app01:detail' pk=12 pp=99 %}</li>
+</ul>
+<p>django中的路由系统和其他语言的框架有所不同，在django中每一个请求的url都要有一条路由映射，这样才能将请求交给对一个的view中的函数去处理。其他大部分的Web框架则是对一类的url请求做一条路由映射，从而是路由系统变得简洁。</p>
+<p>通过反射机制，为django开发一套动态的路由系统Demo：&nbsp;<strong><a href="http://files.cnblogs.com/files/wupeiqi/django_dynamic_router.rar" target="_blank">点击下载</a></strong></p>
+<h3>模板</h3>
+<p><strong>1、模版的执行</strong></p>
+<p>模版的创建过程，对于模版，其实就是读取模版（其中嵌套着模版标签），然后将 Model 中获取的数据插入到模版中，最后将信息返回给用户。</p>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;c043e7a5-80ad-4d05-bdec-bd3bda775755&#39;)"><img id="code_img_closed_c043e7a5-80ad-4d05-bdec-bd3bda775755" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_c043e7a5-80ad-4d05-bdec-bd3bda775755" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;c043e7a5-80ad-4d05-bdec-bd3bda775755&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_c043e7a5-80ad-4d05-bdec-bd3bda775755" class="cnblogs_code_hide">
+<pre><span style="color: #000000;">def current_datetime(request):
+    now = datetime.datetime.now()
+    html = "</span><span style="color: #0000ff;">&lt;</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;&lt;</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;</span>It is now %s.<span style="color: #0000ff;">&lt;/</span><span style="color: #800000;">body</span><span style="color: #0000ff;">&gt;&lt;/</span><span style="color: #800000;">html</span><span style="color: #0000ff;">&gt;</span><span style="color: #000000;">" % now
+    return HttpResponse(html)</span></pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;1872f58f-e803-4a91-95d1-26025f39272b&#39;)"><img id="code_img_closed_1872f58f-e803-4a91-95d1-26025f39272b" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_1872f58f-e803-4a91-95d1-26025f39272b" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;1872f58f-e803-4a91-95d1-26025f39272b&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_1872f58f-e803-4a91-95d1-26025f39272b" class="cnblogs_code_hide">
+<pre><span style="color: #000000;">from django import template
+t = template.Template('My name is {{ name }}.')
+c = template.Context({'name': 'Adrian'})
+print t.render(c)</span></pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;def18854-c0ec-4478-96aa-a9dcb7945849&#39;)"><img id="code_img_closed_def18854-c0ec-4478-96aa-a9dcb7945849" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_def18854-c0ec-4478-96aa-a9dcb7945849" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;def18854-c0ec-4478-96aa-a9dcb7945849&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_def18854-c0ec-4478-96aa-a9dcb7945849" class="cnblogs_code_hide">
+<pre><span style="color: #000000;">import datetime
+from django import template
+import DjangoDemo.settings
+ 
+now = datetime.datetime.now()
+fp = open(settings.BASE_DIR+'/templates/Home/Index.html')
+t = template.Template(fp.read())
+fp.close()
+html = t.render(template.Context({'current_date': now}))
+return HttpResponse(html</span></pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;37ab4d59-9fcd-4b6b-a22c-de8047d2cab7&#39;)"><img id="code_img_closed_37ab4d59-9fcd-4b6b-a22c-de8047d2cab7" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_37ab4d59-9fcd-4b6b-a22c-de8047d2cab7" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;37ab4d59-9fcd-4b6b-a22c-de8047d2cab7&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_37ab4d59-9fcd-4b6b-a22c-de8047d2cab7" class="cnblogs_code_hide">
+<pre><span style="color: #000000;">from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
+import datetime
+ 
+def current_datetime(request):
+    now = datetime.datetime.now()
+    t = get_template('current_datetime.html')
+    html = t.render(Context({'current_date': now}))
+    return HttpResponse(html)</span></pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<div class="cnblogs_code" onclick="cnblogs_code_show(&#39;7dd17bfc-e372-43e3-a7ae-f7ae7e6b3cec&#39;)"><img id="code_img_closed_7dd17bfc-e372-43e3-a7ae-f7ae7e6b3cec" class="code_img_closed" src="./Django【基础篇】_files/ContractedBlock.gif" alt=""><img id="code_img_opened_7dd17bfc-e372-43e3-a7ae-f7ae7e6b3cec" class="code_img_opened" style="display: none;" onclick="cnblogs_code_hide(&#39;7dd17bfc-e372-43e3-a7ae-f7ae7e6b3cec&#39;,event)" src="./Django【基础篇】_files/ExpandedBlockStart.gif" alt="">
+<div id="cnblogs_code_open_7dd17bfc-e372-43e3-a7ae-f7ae7e6b3cec" class="cnblogs_code_hide">
+<pre>return render_to_response('Account/Login.html',data,context_instance=RequestContext(request))</pre>
+</div>
+<span class="cnblogs_code_collapse">View Code</span></div>
+<p><strong>2、模版语言</strong></p>
+<p>　模板中也有自己的语言，该语言可以实现数据展示</p>
+<ul>
+<li>{{ item }}</li>
+<li>{% for item in item_list %} &nbsp;&lt;a&gt;{{ item }}&lt;/a&gt; &nbsp;{% endfor %}<br>　　forloop.counter<br>　　forloop.first<br>　　forloop.last&nbsp;</li>
+<li>{% if ordered_warranty %} &nbsp;{% else %} {% endif %}</li>
+<li>母板：{% block title %}{% endblock %}<br>子板：{% extends "base.html" %}<br>　　　{% block title %}{% endblock %}</li>
+<li>帮助方法：<br>{{ item.event_start|date:"Y-m-d H:i:s"}}<br>{{ bio|truncatewords:"30" }}<br>{{ my_list|first|upper }}<br>{{ name|lower }}</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</ul>
+<p><strong>3、自定义simple_tag</strong></p>
+<p>a、在app中创建templatetags模块</p>
+<p>b、创建任意 .py 文件，如：xx.py</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_530097" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python comments">#!/usr/bin/env python</code></div><div class="line number2 index1 alt1"><code class="python comments">#coding:utf-8</code></div><div class="line number3 index2 alt2"><code class="python keyword">from</code> <code class="python plain">django </code><code class="python keyword">import</code> <code class="python plain">template</code></div><div class="line number4 index3 alt1"><code class="python keyword">from</code> <code class="python plain">django.utils.safestring </code><code class="python keyword">import</code> <code class="python plain">mark_safe</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;</code>&nbsp;</div><div class="line number6 index5 alt1"><code class="python plain">register </code><code class="python keyword">=</code> <code class="python plain">template.Library()</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;</code>&nbsp;</div><div class="line number8 index7 alt1"><code class="python decorator">@register</code><code class="python plain">.simple_tag</code></div><div class="line number9 index8 alt2"><code class="python keyword">def</code> <code class="python plain">my_simple_time(v1,v2,v3):</code></div><div class="line number10 index9 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">return</code>&nbsp; <code class="python plain">v1 </code><code class="python keyword">+</code> <code class="python plain">v2 </code><code class="python keyword">+</code> <code class="python plain">v3</code></div><div class="line number11 index10 alt2"><code class="python spaces">&nbsp;&nbsp;</code>&nbsp;</div><div class="line number12 index11 alt1"><code class="python decorator">@register</code><code class="python plain">.simple_tag</code></div><div class="line number13 index12 alt2"><code class="python keyword">def</code> <code class="python plain">my_input(</code><code class="python functions">id</code><code class="python plain">,arg):</code></div><div class="line number14 index13 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">result </code><code class="python keyword">=</code> <code class="python string">"&lt;input type='text' id='%s' class='%s' /&gt;"</code> <code class="python keyword">%</code><code class="python plain">(</code><code class="python functions">id</code><code class="python plain">,arg,)</code></div><div class="line number15 index14 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">return</code> <code class="python plain">mark_safe(result)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>c、在使用自定义simple_tag的html文件中导入之前创建的 xx.py 文件名</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_326067" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">{</code><code class="python keyword">%</code> <code class="python plain">load xx </code><code class="python keyword">%</code><code class="python plain">}</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>d、使用simple_tag</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_557460" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">{</code><code class="python keyword">%</code> <code class="python plain">my_simple_time </code><code class="python value">1</code> <code class="python value">2</code> <code class="python value">3</code><code class="python keyword">%</code><code class="python plain">}</code></div><div class="line number2 index1 alt1"><code class="python plain">{</code><code class="python keyword">%</code> <code class="python plain">my_input </code><code class="python string">'id_username'</code> <code class="python string">'hide'</code><code class="python keyword">%</code><code class="python plain">}</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>e、在settings中配置当前app，不然django无法找到自定义的simple_tag　　</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_902181" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">INSTALLED_APPS </code><code class="python keyword">=</code> <code class="python plain">(</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.admin'</code><code class="python plain">,</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.auth'</code><code class="python plain">,</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.contenttypes'</code><code class="python plain">,</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.sessions'</code><code class="python plain">,</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.messages'</code><code class="python plain">,</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.staticfiles'</code><code class="python plain">,</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'app01'</code><code class="python plain">,</code></div><div class="line number9 index8 alt2"><code class="python plain">)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p><em><span style="color: #888888;">更多见文档：https://docs.djangoproject.com/en/1.10/ref/templates/language/</span></em></p>
+<h3>中间件</h3>
+<p>django 中的中间件（middleware），在django中，中间件其实就是一个类，在请求到来和结束后，django会根据自己的规则在合适的时机执行中间件中相应的方法。</p>
+<p>在django项目的settings模块中，有一个 MIDDLEWARE_CLASSES&nbsp;变量，其中每一个元素就是一个中间件，如下图。</p>
+<p><img src="./Django【基础篇】_files/102231043354970.png" alt=""></p>
+<p><em>与mange.py在同一目录下的文件夹 wupeiqi/middleware下的auth.py文件中的Authentication类</em></p>
+<p>中间件中可以定义四个方法，分别是：</p>
+<ul>
+<li>process_request(self,request)</li>
+<li>process_view(self, request, callback, callback_args, callback_kwargs)</li>
+<li>process_template_response(self,request,response)</li>
+<li>process_exception(self, request, exception)</li>
+<li>process_response(self, request, response)</li>
+</ul>
+<p>以上方法的返回值可以是None和HttpResonse对象，如果是None，则继续按照django定义的规则向下执行，如果是HttpResonse对象，则直接将该对象返回给用户。</p>
+<p><img style="display: block; margin-left: auto; margin-right: auto;" src="./Django【基础篇】_files/101822420536468.png" alt="" width="413" height="364"></p>
+<h2>自定义中间件</h2>
+<p>1、创建中间件类</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_417727" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">class</code> <code class="python plain">RequestExeute(</code><code class="python functions">object</code><code class="python plain">):</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">def</code> <code class="python plain">process_request(</code><code class="python color1">self</code><code class="python plain">,request):</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">pass</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">def</code> <code class="python plain">process_view(</code><code class="python color1">self</code><code class="python plain">, request, callback, callback_args, callback_kwargs):</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">i </code><code class="python keyword">=</code><code class="python value">1</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">pass</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">def</code> <code class="python plain">process_exception(</code><code class="python color1">self</code><code class="python plain">, request, exception):</code></div><div class="line number9 index8 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">pass</code></div><div class="line number10 index9 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number11 index10 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">def</code> <code class="python plain">process_response(</code><code class="python color1">self</code><code class="python plain">, request, response):</code></div><div class="line number12 index11 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">return</code> <code class="python plain">response</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>2、注册中间件</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_132240" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">MIDDLEWARE_CLASSES </code><code class="python keyword">=</code> <code class="python plain">(</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.sessions.middleware.SessionMiddleware'</code><code class="python plain">,</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.middleware.common.CommonMiddleware'</code><code class="python plain">,</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.middleware.csrf.CsrfViewMiddleware'</code><code class="python plain">,</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.auth.middleware.AuthenticationMiddleware'</code><code class="python plain">,</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.auth.middleware.SessionAuthenticationMiddleware'</code><code class="python plain">,</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.contrib.messages.middleware.MessageMiddleware'</code><code class="python plain">,</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'django.middleware.clickjacking.XFrameOptionsMiddleware'</code><code class="python plain">,</code></div><div class="line number9 index8 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python string">'wupeiqi.middleware.auth.RequestExeute'</code><code class="python plain">,</code></div><div class="line number10 index9 alt1"><code class="python plain">)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<h3>admin</h3>
+<p>django amdin是django提供的一个后台管理页面，改管理页面提供完善的html和css，使得你在通过Model创建完数据库表之后，就可以对数据进行增删改查，而使用django admin 则需要以下步骤：</p>
+<ul>
+<li>创建后台管理员</li>
+<li>配置url</li>
+<li>注册和配置django admin后台管理页面</li>
+</ul>
+<p>1、创建后台管理员</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_23091" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">python manage.py createsuperuser</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>2、配置后台管理url</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_68340" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python plain">url(r</code><code class="python string">'^admin/'</code><code class="python plain">, include(admin.site.urls))</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>3、注册和配置django admin 后台管理页面</p>
+<p>a、在admin中执行如下配置</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_838048" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.contrib </code><code class="python keyword">import</code> <code class="python plain">admin</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="python keyword">from</code> <code class="python plain">app01 </code><code class="python keyword">import</code>&nbsp; <code class="python plain">models</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number5 index4 alt2"><code class="python plain">admin.site.register(models.UserType)</code></div><div class="line number6 index5 alt1"><code class="python plain">admin.site.register(models.UserInfo)</code></div><div class="line number7 index6 alt2"><code class="python plain">admin.site.register(models.UserGroup)</code></div><div class="line number8 index7 alt1"><code class="python plain">admin.site.register(models.Asset)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>b、设置数据表名称</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_488532" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">class</code> <code class="python plain">UserType(models.Model):</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">name </code><code class="python keyword">=</code> <code class="python plain">models.CharField(max_length</code><code class="python keyword">=</code><code class="python value">50</code><code class="python plain">)</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">class</code> <code class="python plain">Meta:</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">verbose_name </code><code class="python keyword">=</code> <code class="python string">'用户类型'</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">verbose_name_plural </code><code class="python keyword">=</code> <code class="python string">'用户类型'</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>c、打开表之后，设定默认显示，需要在model中作如下配置</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_372743" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">class</code> <code class="python plain">UserType(models.Model):</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">name </code><code class="python keyword">=</code> <code class="python plain">models.CharField(max_length</code><code class="python keyword">=</code><code class="python value">50</code><code class="python plain">)</code></div><div class="line number3 index2 alt2"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">def</code> <code class="python plain">__unicode__(</code><code class="python color1">self</code><code class="python plain">):</code></div><div class="line number5 index4 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python keyword">return</code> <code class="python color1">self</code><code class="python plain">.name</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_910606" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.contrib </code><code class="python keyword">import</code> <code class="python plain">admin</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="python keyword">from</code> <code class="python plain">app01 </code><code class="python keyword">import</code>&nbsp; <code class="python plain">models</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number5 index4 alt2"><code class="python keyword">class</code> <code class="python plain">UserInfoAdmin(admin.ModelAdmin):</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">list_display </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'password'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number9 index8 alt2"><code class="python plain">admin.site.register(models.UserType)</code></div><div class="line number10 index9 alt1"><code class="python plain">admin.site.register(models.UserInfo,UserInfoAdmin)</code></div><div class="line number11 index10 alt2"><code class="python plain">admin.site.register(models.UserGroup)</code></div><div class="line number12 index11 alt1"><code class="python plain">admin.site.register(models.Asset)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>d、为数据表添加搜索功能</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_936737" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.contrib </code><code class="python keyword">import</code> <code class="python plain">admin</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="python keyword">from</code> <code class="python plain">app01 </code><code class="python keyword">import</code>&nbsp; <code class="python plain">models</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number5 index4 alt2"><code class="python keyword">class</code> <code class="python plain">UserInfoAdmin(admin.ModelAdmin):</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">list_display </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'password'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">search_fields </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number9 index8 alt2"><code class="python plain">admin.site.register(models.UserType)</code></div><div class="line number10 index9 alt1"><code class="python plain">admin.site.register(models.UserInfo,UserInfoAdmin)</code></div><div class="line number11 index10 alt2"><code class="python plain">admin.site.register(models.UserGroup)</code></div><div class="line number12 index11 alt1"><code class="python plain">admin.site.register(models.Asset)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>e、添加快速过滤</p>
+<div class="cnblogs_Highlighter sh-gutter">
+<div><div id="highlighter_342384" class="syntaxhighlighter collapsed  python"><div class="toolbar"><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_expandSource expandSource">+ View Code</a></span><span><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">from</code> <code class="python plain">django.contrib </code><code class="python keyword">import</code> <code class="python plain">admin</code></div><div class="line number2 index1 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number3 index2 alt2"><code class="python keyword">from</code> <code class="python plain">app01 </code><code class="python keyword">import</code>&nbsp; <code class="python plain">models</code></div><div class="line number4 index3 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number5 index4 alt2"><code class="python keyword">class</code> <code class="python plain">UserInfoAdmin(admin.ModelAdmin):</code></div><div class="line number6 index5 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">list_display </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'password'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number7 index6 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">search_fields </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number8 index7 alt1"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">list_filter </code><code class="python keyword">=</code> <code class="python plain">(</code><code class="python string">'username'</code><code class="python plain">, </code><code class="python string">'email'</code><code class="python plain">)</code></div><div class="line number9 index8 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number10 index9 alt1"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number11 index10 alt2"><code class="python spaces">&nbsp;</code>&nbsp;</div><div class="line number12 index11 alt1"><code class="python plain">admin.site.register(models.UserType)</code></div><div class="line number13 index12 alt2"><code class="python plain">admin.site.register(models.UserInfo,UserInfoAdmin)</code></div><div class="line number14 index13 alt1"><code class="python plain">admin.site.register(models.UserGroup)</code></div><div class="line number15 index14 alt2"><code class="python plain">admin.site.register(models.Asset)</code></div></div></td></tr></tbody></table></div></div>
+</div>
+<p>更多：http://docs.30c.org/djangobook2/chapter06/</p>
+<p>　　</p>
+<p>&nbsp;</p></div><div id="MySignature" style="display: block;"><div id="AllanboltSignature">
+<div style="border-bottom: #e0e0e0 1px dashed; border-left: #e0e0e0 1px dashed; padding: 10px; font-family: 微软雅黑; font-size: 11px; border-top: #e0e0e0 1px dashed; border-right: #e0e0e0 1px dashed; " id="PSignature">
+<div style="float:left;width:10%;">
+     <img src="./Django【基础篇】_files/o_Warning.png" style="width:70px;height:70px">
+</div>
+<div style="float:left;width:90%;padding-top:10px;">
+作者：<a href="http://www.cnblogs.com/wupeiqi/" target="_blank">武沛齐</a> <br>
+出处：<a href="http://www.cnblogs.com/wupeiqi/" target="_blank">http://www.cnblogs.com/wupeiqi/</a> <br>
+本文版权归作者和博客园共有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文连接。<br>
+</div>
+<div style="clear:both;"></div>
+</div>
+</div></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info"><div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(5237704,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+            <a id="green_channel_follow" onclick="follow(&#39;7208b24d-95c9-e111-aa3f-842b2b196315&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./Django【基础篇】_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./Django【基础篇】_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/wupeiqi/" target="_blank"><img src="./Django【基础篇】_files/20130809170024.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/wupeiqi/">武沛齐</a><br>
+            <a href="http://home.cnblogs.com/u/wupeiqi/followees">关注 - 44</a><br>
+            <a href="http://home.cnblogs.com/u/wupeiqi/followers">粉丝 - 6097</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;7208b24d-95c9-e111-aa3f-842b2b196315&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(5237704,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">8</span>
+    </div>
+    <div class="buryit" onclick="votePost(5237704,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="https://www.cnblogs.com/wupeiqi/articles/5237672.html" class="p_n_p_prefix">« </a> 上一篇：<a href="https://www.cnblogs.com/wupeiqi/articles/5237672.html" title="发布于2016-03-03 10:45">Python之路【第十五篇】：Web框架</a><br><a href="https://www.cnblogs.com/wupeiqi/articles/5246483.html" class="p_n_p_prefix">» </a> 下一篇：<a href="https://www.cnblogs.com/wupeiqi/articles/5246483.html" title="发布于2016-03-06 06:12">Python之路【第十七篇】：Django【进阶篇 】</a><br></div>
+</div>
+
+
+		</div>
+		<div class="postDesc">posted @ <span id="post-date">2016-03-03 10:51</span> <a href="https://www.cnblogs.com/wupeiqi/">武沛齐</a> 阅读(<span id="post_view_count">27710</span>) 评论(<span id="post_comment_count">4</span>) &nbsp;<a href="https://i.cnblogs.com/EditArticles.aspx?postid=5237704" rel="nofollow">编辑</a> <a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" onclick="AddToWz(5237704);return false;">收藏</a></div>
+	</div>
+	<script type="text/javascript">var allowComments=true,cb_blogId=133379,cb_entryId=5237704,cb_blogApp=currentBlogApp,cb_blogUserGuid='7208b24d-95c9-e111-aa3f-842b2b196315',cb_entryCreatedDate='2016/3/3 10:51:00';loadViewCount(cb_entryId);var cb_postType=2;</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"><div id="comments_pager_top"></div>
+<!--done-->
+<div class="feedback_area_title">评论列表</div>
+<div class="feedbackNoItems"></div>
+	
+
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#3875880" class="layer">#1楼</a><a name="3875880" id="comment_anchor_3875880"></a>  <span class="comment_date">2017-12-28 09:02</span> <a id="a_comment_author_3875880" href="https://www.cnblogs.com/nopnog/" target="_blank">Mr.joey</a> <a href="http://msg.cnblogs.com/send/Mr.joey" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3875880" class="blog_comment_body"><img src="./Django【基础篇】_files/1173149-20171228090135488-1411566891.png" alt="" border="0" "=""><br><br><br>武sir，这个表格在写博客的时候怎么添加呢？请赐教，看了好久没看明白，前端没啥基础，哈</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3875880,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3875880,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_3875880_avatar" style="display:none;">http://pic.cnblogs.com/face/1173149/20170527093028.png</span>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#3891595" class="layer">#2楼</a><a name="3891595" id="comment_anchor_3891595"></a>  <span class="comment_date">2018-01-17 10:25</span> <a id="a_comment_author_3891595" href="https://www.cnblogs.com/tangtingmary/" target="_blank">MaryMaryTang</a> <a href="http://msg.cnblogs.com/send/MaryMaryTang" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3891595" class="blog_comment_body"><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#3875880" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,3875880);">@</a>
+Mr.joey<br>编辑页面有两个按钮任意点一个都可以添加<br><img src="./Django【基础篇】_files/1247807-20180117102512631-48865235.png" alt="" border="0" "=""></div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3891595,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3891595,&#39;Bury&#39;,this)">反对(1)</a></div><span id="comment_3891595_avatar" style="display:none;">http://pic.cnblogs.com/face/1247807/20170926120107.png</span>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#4032768" class="layer">#3楼</a><a name="4032768" id="comment_anchor_4032768"></a>  <span class="comment_date">2018-07-31 18:38</span> <a id="a_comment_author_4032768" href="https://www.cnblogs.com/ismiled/" target="_blank">我笑了</a> <a href="http://msg.cnblogs.com/send/%E6%88%91%E7%AC%91%E4%BA%86" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_4032768" class="blog_comment_body">import pymysql<br>pymysql.install_as_MySQLdb()<br>武老师为什么武在mac上面用django连接mysql连接不上啊，<br>一直提示No module named 'pymysql'</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4032768,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(4032768,&#39;Bury&#39;,this)">反对(0)</a></div>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#4033890" class="layer">#4楼</a><a name="4033890" id="comment_anchor_4033890"></a><span id="comment-maxId" style="display:none;">4033890</span><span id="comment-maxDate" style="display:none;">2018/8/2 10:25:22</span>  <span class="comment_date">2018-08-02 10:25</span> <a id="a_comment_author_4033890" href="https://www.cnblogs.com/welan/" target="_blank">蔚蓝的蓝</a> <a href="http://msg.cnblogs.com/send/%E8%94%9A%E8%93%9D%E7%9A%84%E8%93%9D" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_4033890" class="blog_comment_body">那个，请问几个问题<br>1、如果在post表单中添加{% csrf_token %}字段，那么django的csrfmiddleware中间件会自动为此站点生成&lt;input name='csrfmiddlewaretoken' value='随机字符串' /&gt; 这个字段是django为信赖的站点自动完成的吗？<br>2、既然csrf令牌是一段随机字符串，django将它存储在哪，缓存还是数据库？<br>3、客户端第一次访问站点，django会在响应中set-cookie：csrftoken=随即字符串，下一次的http请求浏览器也会拿着cookie去与django匹配，那这个csrf与上面的input中的令牌有什么区别？<br>4、既然使用ajax以post方式发送请求，要用的cookie中的csrf令牌，xhr.setRequestHeader("X-CSRFToken", csrftoken);或者是getCookie('csrfgoken')，那么浏览器cookie就不会被伪造站点利用？</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4033890,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(4033890,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_4033890_avatar" style="display:none;">http://pic.cnblogs.com/face/1367382/20180402213221.png</span>
+			</div>
+		</div>
+	<div id="comments_pager_bottom"></div></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"></div>
+<div id="opt_under_post"></div>
+<div id="cnblogs_c1" class="c_ad_block"></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="https://news.cnblogs.com/n/610001/" target="_blank">IBM 发表论文证明量子系统比经典系统更快</a><br> ·  <a href="https://news.cnblogs.com/n/610000/" target="_blank">传今日头条正进行40亿美元Pre-IPO轮融资</a><br> ·  <a href="https://news.cnblogs.com/n/609999/" target="_blank">受云业务提振 微软或将是下一个万亿美元市值成员</a><br> ·  <a href="https://news.cnblogs.com/n/609997/" target="_blank">牛电科技登陆纳斯达克：开盘价8.5美元 跌破发行价</a><br> ·  <a href="https://news.cnblogs.com/n/609998/" target="_blank">吴恩达说，现在你能拿手机叫辆自动驾驶车去市中心</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<script async="async" src="./Django【基础篇】_files/gpt.js.下载"></script>
+<script>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+</script>
+
+<script>
+  googletag.cmd.push(function() {
+    googletag.defineSlot('/1090369/C2', [468, 60], 'div-gpt-ad-1539008685004-0').addService(googletag.pubads());
+    googletag.pubads().enableSingleRequest();
+    googletag.enableServices();
+  });
+</script>
+<div id="cnblogs_c2" class="c_ad_block">
+    <div id="div-gpt-ad-1539008685004-0" style="height:60px; width:468px;" data-google-query-id="CLOYs5r8k94CFcuylgod3MUJIA">
+    <script>
+    if (new Date() >= new Date(2018, 9, 13)) {
+        googletag.cmd.push(function() { googletag.display('div-gpt-ad-1539008685004-0'); });
+    }
+    </script>
+    <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C2_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C2_0" width="468" height="60" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border: 0px; vertical-align: bottom;" data-load-complete="true" src="./Django【基础篇】_files/saved_resource.html"></iframe></div></div>
+</div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="https://kb.cnblogs.com/page/609730/" target="_blank">阿里云的这群疯子</a><br> ·  <a href="https://kb.cnblogs.com/page/606682/" target="_blank">为什么说 Java 程序员必须掌握 Spring Boot ？</a><br> ·  <a href="https://kb.cnblogs.com/page/606645/" target="_blank">在学习中，有一个比掌握知识更重要的能力</a><br> ·  <a href="https://kb.cnblogs.com/page/603663/" target="_blank">如何招到一个靠谱的程序员</a><br> ·  <a href="https://kb.cnblogs.com/page/573614/" target="_blank">一个故事看懂“区块链”</a><br></div>» <a href="https://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"><b>历史上的今天:</b><br>2013-03-03 <a href="https://www.cnblogs.com/wupeiqi/archive/2013/03/03/2941295.html">http的请求和响应过程2</a><br>2013-03-03 <a href="https://www.cnblogs.com/wupeiqi/archive/2013/03/03/2941245.html">http的请求和响应过程1</a><br></div>
+<script type="text/javascript">
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	<div id="blog-news"><h4 style="padding-top:10px;text-align:center"><a style="font-size:20px;" href="https://www.luffycity.com/?source=wusir">路飞学城作者</a></h4>
+<h4 style="padding-top:10px">最新免费视频：<a href="http://www.pythonav.com/all/10000.html">PythonAV.com </a></h4>
+<h4 style="padding-top:10px">Python技术交流群：737658057 </h4>
+
+<a href="https://www.luffycity.com/home/camp?source=wupeiqiblog" target="_blank" style="font-weight: bold; font-size: 15px">
+   <img src="./Django【基础篇】_files/o_14camp.png" alt="路飞学城作者" width="240px">
+</a><div id="profile_block">昵称：<a href="https://home.cnblogs.com/u/wupeiqi/">武沛齐</a><br>园龄：<a href="https://home.cnblogs.com/u/wupeiqi/" title="入园时间：2012-07-09">6年3个月</a><br>粉丝：<a href="https://home.cnblogs.com/u/wupeiqi/followers/">6097</a><br>关注：<a href="https://home.cnblogs.com/u/wupeiqi/followees/">44</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="follow(&#39;7208b24d-95c9-e111-aa3f-842b2b196315&#39;)">+加关注</a></div><script>getFollowStatus('7208b24d-95c9-e111-aa3f-842b2b196315')</script></div></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="calendar"><div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2018/09/01&#39;);return false;">&lt;</a></td><td align="center">2018年10月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2018/11/01&#39;);return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" align="center" abbr="日" scope="col">日</th><th class="CalDayHeader" align="center" abbr="一" scope="col">一</th><th class="CalDayHeader" align="center" abbr="二" scope="col">二</th><th class="CalDayHeader" align="center" abbr="三" scope="col">三</th><th class="CalDayHeader" align="center" abbr="四" scope="col">四</th><th class="CalDayHeader" align="center" abbr="五" scope="col">五</th><th class="CalDayHeader" align="center" abbr="六" scope="col">六</th></tr><tr><td class="CalOtherMonthDay" align="center">30</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td class="CalWeekendDay" align="center">6</td></tr><tr><td class="CalWeekendDay" align="center">7</td><td align="center">8</td><td align="center">9</td><td align="center">10</td><td align="center">11</td><td align="center">12</td><td class="CalWeekendDay" align="center">13</td></tr><tr><td class="CalWeekendDay" align="center">14</td><td align="center">15</td><td align="center">16</td><td align="center">17</td><td align="center">18</td><td align="center">19</td><td class="CalTodayDay" align="center">20</td></tr><tr><td class="CalWeekendDay" align="center">21</td><td align="center">22</td><td align="center">23</td><td align="center">24</td><td align="center">25</td><td align="center">26</td><td class="CalWeekendDay" align="center">27</td></tr><tr><td class="CalWeekendDay" align="center">28</td><td align="center">29</td><td align="center">30</td><td align="center">31</td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td><td class="CalOtherMonthDay" align="center">3</td></tr><tr><td class="CalOtherMonthDay" align="center">4</td><td class="CalOtherMonthDay" align="center">5</td><td class="CalOtherMonthDay" align="center">6</td><td class="CalOtherMonthDay" align="center">7</td><td class="CalOtherMonthDay" align="center">8</td><td class="CalOtherMonthDay" align="center">9</td><td class="CalOtherMonthDay" align="center">10</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script></div>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block"></div><div id="sidebar_toptags" class="sidebar-block">
+<div class="catListTag">
+<h3 class="catListTitle">我的标签</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/wupeiqi/tag/ASP.NET%20MVC/">ASP.NET MVC</a>(15)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/Python/">Python</a>(13)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/Tornado/">Tornado</a>(5)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/python%E4%B9%8B%E8%B7%AF/">python之路</a>(4)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/%E5%B8%88%E5%85%84%E9%9D%A2%E8%AF%95%E5%88%86%E4%BA%AB%E7%B3%BB%E5%88%97/">师兄面试分享系列</a>(2)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/Python%E5%BC%80%E6%BA%90%E7%BB%84%E4%BB%B6%20-%20Tyrion/">Python开源组件 - Tyrion</a>(1)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/Python%E9%9D%A2%E8%AF%95315%E9%A2%98/">Python面试315题</a>(1)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/Git/">Git</a>(1)</li><li><a href="https://www.cnblogs.com/wupeiqi/tag/JavaScript/">JavaScript</a>(1)</li>
+</ul>
+</div></div><div id="sidebar_categories">
+<div class="catListPostCategory">
+<h3 class="catListTitle">随笔分类</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_0_Link_0" href="https://www.cnblogs.com/wupeiqi/category/850028.html">JavaScript(1)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_1" href="https://www.cnblogs.com/wupeiqi/category/463114.html">MVC(15)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_2" href="https://www.cnblogs.com/wupeiqi/category/675825.html">Python(13)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_3" href="https://www.cnblogs.com/wupeiqi/category/478106.html">其他(37)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_4" href="https://www.cnblogs.com/wupeiqi/category/456428.html">请求响应(6)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_5" href="https://www.cnblogs.com/wupeiqi/category/510969.html">设计模式(9)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_6" href="https://www.cnblogs.com/wupeiqi/category/478755.html">微软C#(34)</a> </li>
+
+</ul>
+
+</div>
+
+<div class="catListPostArchive">
+<h3 class="catListTitle">随笔档案</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_1_Link_0" href="https://www.cnblogs.com/wupeiqi/archive/2018/08.html">2018年8月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_1" href="https://www.cnblogs.com/wupeiqi/archive/2018/05.html">2018年5月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_2" href="https://www.cnblogs.com/wupeiqi/archive/2018/04.html">2018年4月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_3" href="https://www.cnblogs.com/wupeiqi/archive/2018/03.html">2018年3月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_4" href="https://www.cnblogs.com/wupeiqi/archive/2017/08.html">2017年8月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_5" href="https://www.cnblogs.com/wupeiqi/archive/2017/05.html">2017年5月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_6" href="https://www.cnblogs.com/wupeiqi/archive/2017/03.html">2017年3月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_7" href="https://www.cnblogs.com/wupeiqi/archive/2016/10.html">2016年10月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_8" href="https://www.cnblogs.com/wupeiqi/archive/2016/07.html">2016年7月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_9" href="https://www.cnblogs.com/wupeiqi/archive/2015/10.html">2015年10月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_10" href="https://www.cnblogs.com/wupeiqi/archive/2015/08.html">2015年8月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_11" href="https://www.cnblogs.com/wupeiqi/archive/2015/07.html">2015年7月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_12" href="https://www.cnblogs.com/wupeiqi/archive/2015/06.html">2015年6月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_13" href="https://www.cnblogs.com/wupeiqi/archive/2015/04.html">2015年4月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_14" href="https://www.cnblogs.com/wupeiqi/archive/2014/03.html">2014年3月 (3)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_15" href="https://www.cnblogs.com/wupeiqi/archive/2014/01.html">2014年1月 (3)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_16" href="https://www.cnblogs.com/wupeiqi/archive/2013/12.html">2013年12月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_17" href="https://www.cnblogs.com/wupeiqi/archive/2013/11.html">2013年11月 (2)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_18" href="https://www.cnblogs.com/wupeiqi/archive/2013/10.html">2013年10月 (7)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_19" href="https://www.cnblogs.com/wupeiqi/archive/2013/08.html">2013年8月 (17)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_20" href="https://www.cnblogs.com/wupeiqi/archive/2013/07.html">2013年7月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_21" href="https://www.cnblogs.com/wupeiqi/archive/2013/06.html">2013年6月 (14)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_22" href="https://www.cnblogs.com/wupeiqi/archive/2013/05.html">2013年5月 (23)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_23" href="https://www.cnblogs.com/wupeiqi/archive/2013/04.html">2013年4月 (3)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_24" href="https://www.cnblogs.com/wupeiqi/archive/2013/03.html">2013年3月 (13)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_25" href="https://www.cnblogs.com/wupeiqi/archive/2013/02.html">2013年2月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_26" href="https://www.cnblogs.com/wupeiqi/archive/2012/11.html">2012年11月 (26)</a> </li>
+
+</ul>
+
+</div>
+
+<div class="catListArticleCategory">
+<h3 class="catListTitle">文章分类</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_2_Link_0" href="https://www.cnblogs.com/wupeiqi/category/1141703.html">flask</a> </li>
+
+</ul>
+
+</div>
+
+<div class="catListImageCategory">
+<h3 class="catListTitle">相册</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_3_Link_0" href="https://www.cnblogs.com/wupeiqi/gallery/662608.html" rel="nofollow">git(4)</a> </li>
+
+</ul>
+
+</div>
+
+</div><div id="sidebar_scorerank" class="sidebar-block">
+<div class="catListBlogRank">
+<h3 class="catListTitle">积分与排名</h3>
+<ul>
+	<li class="liScore">
+		积分 -	336241
+	</li>
+	<li class="liRank">
+		排名 -	604
+	</li>
+</ul>
+</div>
+
+
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<div class="catListComment">
+<h3 class="catListTitle">最新评论</h3>
+	<div id="RecentCommentsBlock"><ul>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/wupeiqi/articles/5713323.html#4091902">1. Re:Python开发【第十八篇】：MySQL（二）</a></li>
+        <li class="recent_comment_body">索引补充：<a href="https://www.cnblogs.com/wupeiqi/articles/5237704.html" target="_blank"></a></li>
+        <li class="recent_comment_author">--Uncle_Drew</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/wupeiqi/p/8629419.html#4090467">2. Re:第一篇：tz师兄【附面试题总结】</a></li>
+        <li class="recent_comment_body">藏这么隐蔽  我才看见</li>
+        <li class="recent_comment_author">--_王晓东</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/wupeiqi/p/4493506.html#4089840">3. Re:Python 面向对象（初级篇）</a></li>
+        <li class="recent_comment_body">武老师，方框内的这句代码是不是不执行啊？这句代码不写也不报错?</li>
+        <li class="recent_comment_author">--小拇哥</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/wupeiqi/articles/5643298.html#4088105">4. Re:Python开发【第十二篇】：DOM</a></li>
+        <li class="recent_comment_body">123 123 123 老师，这段代码，执行会报错，是作用域的问题，但是我把鼠标移到表格里时，打印出来的i都是3，理论上不是i最多等于2就结束了for......</li>
+        <li class="recent_comment_author">--Chase314</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/wupeiqi/articles/5748496.html#4087202">5. Re:MySQL练习题参考答案</a></li>
+        <li class="recent_comment_body">38题正确答案：SELECT * FROM(SELECT student_id,COUNT(student_id) as count1 from score GROUP BY student_id) ......</li>
+        <li class="recent_comment_author">--Uncle_Drew</li>
+</ul>
+</div>
+</div>
+</div></div></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright ©2018 武沛齐
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+<iframe id="google_osd_static_frame_7468894281898" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;" src="./Django【基础篇】_files/saved_resource(1).html"></iframe></body></html>

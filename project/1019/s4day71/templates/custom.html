@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap-4.0.0-dist/css/bootstrap.css">
+</head>
+<body>
+    <h1>自定义分页</h1>
+    <ul>
+        {% for foo in result %}
+            <li>{{ foo.name }}</li>
+        
+        {% endfor %}
+        
+    </ul>
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      {{ page_list.pager|safe }}
+
+  </ul>
+</nav>
+</body>
+</html>

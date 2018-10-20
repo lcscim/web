@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        ul{
+            list-style-type: none;
+        }
+        .outer{
+            margin: 50px auto;
+            width: 1024px;
+            height: 768px;
+            position: relative;
+        }
+        .img li{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .num{
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            top: 680px;
+        }
+        .num li{
+            display: inline-block;
+            height: 20px;
+            width: 20px;
+            background-color: gray;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 40%;
+            margin: 0 10px;
+        }
+        .btn{
+            position: absolute;
+            height: 60px;
+            width: 30px;
+            background-color: darkgray;
+            color: #ffffff;
+            text-align: center;
+            line-height: 60px;
+            top: 50%;
+            margin-top: -30px;
+            display: none;
+        }
+        .left_btn{
+            left: 0;
+        }
+        .right_btn{
+            right: 0;
+        }
+        .outer:hover .btn{
+            display: block;
+        }
+        .current{
+            background-color: red!important;
+        }
+
+    </style>
+</head>
+<body>
+<div class="outer">
+    <ul class="img">
+        <li><a><img src="image/Chrysanthemum.jpg"></a></li>
+        <li><a><img src="image/Desert.jpg"></a></li>
+        <li><a><img src="image/Hydrangeas.jpg"></a></li>
+        <li><a><img src="image/Jellyfish.jpg"></a></li>
+    </ul>
+    <ul class="num">
+        <li class="current">1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+    </ul>
+    <div class="left_btn btn"> < </div>
+    <div class="right_btn btn"> > </div>
+</div>
+<script src="jquery-3.3.1.js"></script>
+<script>
+    $(".num li").mouseover(
+        function () {
+            $(this).addClass("current").siblings().removeClass("current");
+            var index=$(this).index();
+            $(".img li").eq(index).fadeIn(1000).siblings().fadeOut(1000);
+            i=index;
+        }
+
+    )
+    var time=setInterval(move,2000);
+    var i=0;
+    function move() {
+        if (i==3){
+            i=-1;
+        }
+        i++;
+        $(".num li").eq(i).addClass("current").siblings().removeClass("current");
+        $(".img li").eq(i).stop().fadeIn(1000).siblings().stop().fadeOut(1000);
+
+    }
+    function moveLeft(){
+        if (i==0){
+            i=4;
+        }
+        i--;
+        $(".num li").eq(i).addClass("current").siblings().removeClass("current");
+        $(".img li").eq(i).stop().fadeIn(1000).siblings().stop().fadeOut(1000);
+
+    }
+    $(".outer").hover(
+        function () {
+            clearInterval(time);
+        },function () {
+            time=setInterval(move,2000);
+        }
+    )
+    $(".right_btn").click(
+        function () {
+            move();
+        }
+    )
+    $(".left_btn").click(
+        function () {
+            moveLeft();
+        }
+    )
+
+</script>
+</body>
+</html>

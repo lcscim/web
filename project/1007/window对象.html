@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input id="ID1" type="text" onclick="begin()">
+<input type="button" onclick="begin()" value="start">
+<input type="button" onclick="end()" value="end">
+<script>
+    function showTime(){
+        //获取当前时间
+        var nowd2=new Date().toLocaleString();
+        //关联ID，如果button被点击了将值设置为nod2
+        var temp=document.getElementById("ID1");
+        temp.value=nowd2;
+    }
+    var clock;
+    function begin(){
+        if (clock==undefined){
+             showTime();
+             clock=setInterval(showTime,1000);
+        }
+    }
+    function end(){
+        clearInterval(clock);
+
+    }
+</script>
+
+</body>
+</html>

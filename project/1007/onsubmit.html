@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="form" onsubmit="check()">
+    <input type="text" name="username">
+    <input type="submit">
+</form>
+<script>
+    //方法1：关联提交动作
+    // var Form = document.getElementById("form");
+    // Form.onsubmit=function (evnt) {
+    //     alert("提交失败");
+    //     evnt.preventDefault();
+    // }
+    //方法二：直接调用函数
+    // function check(){
+    //     alert(123);
+    //     return false;
+    // }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-3.3.1.js"></script>
+    <script>
+         function selectall(){
+             //匹配table标签下input的type属性为CheckBox的标签集，并将其添加checked属性，值为TRUE被选中
+             $("table :checkbox").prop("checked",true)
+         }
+         function che(){
+             $("table :checkbox").prop("checked",false)
+         }
+         function reverse(){
+             //对选中的集合用jQuery的each方法进行遍历，如果当前被选中的标签属性为checked被选中，则取消其选中状态。否则与其相反
+             $("table :checkbox").each(function(){
+                 if ($(this).prop("checked")){
+                     $(this).prop("checked",false)
+                 }
+                 else {
+                     $(this).prop("checked",true)
+                 }
+
+             });
+         }
+
+    </script>
+</head>
+<body>
+
+     <button onclick="selectall();">全选</button>
+     <button onclick="che();">取消</button>
+     <button onclick="reverse();">反选</button>
+
+     <table border="1">
+         <tr>
+             <td><input type="checkbox"></td>
+             <td>111</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox"></td>
+             <td>222</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox"></td>
+             <td>333</td>
+         </tr>
+         <tr>
+             <td><input type="checkbox"></td>
+             <td>444</td>
+         </tr>
+     </table>
+</body>
+</html>

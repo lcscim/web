@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="db" uuid="4092699c-cd9f-4c8e-99d3-1e3f76f5ae72">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" family="SQLITE" exact-version="0.0" />
+      <auth-required>false</auth-required>
+      <introspection-schemas>*:*</introspection-schemas>
+    </data-source>
+    <data-source name="identifier.sqlite" uuid="219287c2-67d0-40f4-b5c3-aa9e1fdad0bb">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" family="SQLITE" exact-version="0.0" />
+      <secret-storage>master_key</secret-storage>
+      <auth-required>false</auth-required>
+      <first-sync>true</first-sync>
+    </data-source>
+    <data-source name="@localhost" uuid="f5102d20-85f0-44ba-91c9-17ba1ebf50e2">
+      <database-info product="MySQL" version="5.7.21-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.46 ( Revision: 9cc87a48e75c2d2e87c1a293b2862ce651cb256e )" family="MYSQL" exact-version="5.7.21">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower" />
+      <user-name>root</user-name>
+      <introspection-schemas>*:@</introspection-schemas>
+    </data-source>
+    <data-source name="db [2]" uuid="ca7431ed-cc19-4601-9df8-9603aee2347d">
+      <database-info product="SQLite" version="3.20.1" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.20.1.1" family="SQLITE" exact-version="3.20.1" />
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
+      <auth-required>false</auth-required>
+      <introspection-schemas>*:@</introspection-schemas>
+    </data-source>
+  </component>
+</project>

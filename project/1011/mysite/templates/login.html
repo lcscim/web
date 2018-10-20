@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{#使用别名{% url "alex" %}，alex为urls的path('login/', views.login,name="alex"),的name值#}
+<form action={% url "blogs" %} method="post">
+{#<form action="/login/" method="post">#}
+    <input type="text" name="username">
+    <input type="password" name="password">
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>

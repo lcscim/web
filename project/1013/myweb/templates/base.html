@@ -1,0 +1,52 @@
+{% load my_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{margin: 0;}
+        .page-header{
+            height: 50px;
+            background-color: rebeccapurple;
+        }
+        .page-body .menu{
+            height: 800px;
+            background-color: antiquewhite;
+            float: left;
+            width: 20%;
+        }
+        .page-body .content{
+            height: 800px;
+            background-color: cornflowerblue;
+            float: left;
+            width: 80%;
+        }
+        .page-footer{
+            height: 50px;
+            background-color: darkcyan;
+            clear: both;
+        }
+    </style>
+</head>
+<div>
+    <div class="page-header"></div>
+    <div class="page-body">
+        <div class="menu">
+            <a href="/index/">订单</a><br>
+            <a href="/shopping_car/">购物车</a><br>
+        </div>
+        <div class="content">
+            {{ num|filter_multi:8 }}
+            父类
+            {% block content %}
+            {% endblock %}
+            {% block name %}
+            {% endblock %}
+        </div>
+
+    </div>
+    <div class="page-footer"></div>
+</div>
+</body>
+</html>
