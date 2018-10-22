@@ -56,4 +56,24 @@ class custom(View):
 
 
 
+def login(req):
+    if req.method=='GET':
+        return render(req,'login.html')
+    else:
+        name=req.POST.get('username')
+        pwd=req.POST.get('pwd')
+        obj = models.UserAdamin.objects.filter(username=name, password=pwd).first()
+        if obj:
+            req.session['username']=obj.username
+            req.session['email']='alex@163.com'
 
+            return redirect('index.html')
+        else:
+            return render(req,'login.html')
+
+def index(req):
+    if req.session.get('username')=='alex':
+
+        return HttpResponse('登陆成功')
+    else:
+        return render(req,'login.html')

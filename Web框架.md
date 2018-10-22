@@ -547,3 +547,32 @@ Django【基础篇】
 https://www.cnblogs.com/wupeiqi/articles/5237704.html
 Django【进阶篇】
 https://www.cnblogs.com/wupeiqi/articles/5246483.html
+Django之Model操作
+https://www.cnblogs.com/wupeiqi/articles/6216618.html
+
+#10.22
+##1.注意
+- 一个关系表的两项 都是另一个数据表的主键
+	from django.db import models
+	
+	class UserInfo(models.Model):
+	    nickname=models.CharField(max_length=32)
+	    username=models.CharField(max_length=32)
+	    password=models.CharField(max_length=64)
+	    gender_choices={
+	        (1,'男'),
+	        (2,'女'),
+	    }
+	    gender=models.IntegerField(choices=gender_choices)
+	
+	# 反向操作时会造成冲突
+	#obj对象男是u2u_set.all(),女是u2u_set.all()
+	#解决办法related_query_name
+	#此时就是a_set.all()  男 b_set.all()
+	# 或者related_name  常用作替换反响查找名
+	# 此时就是a.all()  男 b.all()
+	class U2U(models.Model):
+	    g=models.ForeignKey('UserInfo',on_delete=models.CASCADE,related_name='a')
+	    b=models.ForeignKey('UserInfo',on_delete=models.CASCADE,related_name='b')
+
+
