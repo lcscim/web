@@ -549,6 +549,8 @@ Django【进阶篇】
 https://www.cnblogs.com/wupeiqi/articles/5246483.html
 Django之Model操作
 https://www.cnblogs.com/wupeiqi/articles/6216618.html
+Django之Form组件
+https://www.cnblogs.com/wupeiqi/articles/6144178.html
 
 #10.22
 ##1.注意
