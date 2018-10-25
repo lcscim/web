@@ -576,5 +576,27 @@ https://www.cnblogs.com/wupeiqi/articles/6144178.html
 	class U2U(models.Model):
 	    g=models.ForeignKey('UserInfo',on_delete=models.CASCADE,related_name='a')
 	    b=models.ForeignKey('UserInfo',on_delete=models.CASCADE,related_name='b')
+- 加了星号（*）的变量名会存放所有未命名的变量参数，不能存放dict，否则报错。
 
+	def multiple(arg, *args):
+	  print "arg: ", arg
+	  #打印不定长参数
+	  for value in args:
+	    print "other args:", value
+	if __name__ == '__main__':
+	  multiple(1,'a',True)
+	![](https://files.jb51.net/file_images/article/201802/201822101943983.png?201812102032)
 
+- 加了星号（**）的变量名会存放所有未命名的变量参数
+
+	def multiple2(**args):
+	  #打印不定长参数
+	  for key in args:
+	    print key + ":" + bytes(args[key])
+	if __name__ == '__main__':
+	  multiple2(name='Amy', age=12, single=True)
+	![](https://files.jb51.net/file_images/article/201802/201822102125871.png?201812102144)
+- 定义可变参数和关键字参数的语法：
+
+	*args是可变参数，args接收的是一个tuple；
+	**kw是关键字参数，kw接收的是一个dict。

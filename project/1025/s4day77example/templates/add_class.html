@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>添加班级</h1>
+<form action="/add_class/" method="post" novalidate>
+    {% csrf_token %}
+    {{ obj.title }} {{ obj.errors.title.0 }}
+    <input type="submit">
+</form>
+</body>
+</html>
