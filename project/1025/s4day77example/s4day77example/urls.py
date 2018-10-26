@@ -23,4 +23,8 @@ urlpatterns = [
     url(r'^class_list/', views.class_list),
     url(r'^add_class/', views.add_class),
     url(r'^edit_class/(\d+)/', views.edit_class),
+
+    url(r'^student_list/', views.student_list),
+    url(r'^add_student/', views.add_student),
+    url(r'^edit_student/(\d+)/', views.edit_student),
 ]
