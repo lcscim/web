@@ -1,0 +1,37 @@
+https://www.cnblogs.com/wupeiqi/articles/7552008.html
+
+回顾：
+	1.装饰器
+		
+	2.session&cookie原理
+
+flask框架：
+	1.介绍Flask	Django Tornado框架
+	2.Flask快速入门
+	3.配置文件
+	4.路由系统
+	5.模板语言
+	6.请求&响应相关
+	7.Session&cookie
+	8.闪现
+	9.蓝图
+	10.请求拓展（Django中间件）
+	11.中间件
+
+详细内容：
+
+1.介绍Flask	Django Tornado框架
+	Django：包含了非常多的组件：ORM，Form，
+
+
+2.Flask快速入门
+3.配置文件
+4.路由系统
+5.模板语言
+6.请求&响应相关
+7.Session&cookie
+8.闪现
+9.蓝图
+10.请求拓展（Django中间件）
+11.中间件
+
