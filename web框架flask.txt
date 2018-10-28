@@ -4,6 +4,17 @@ https://www.cnblogs.com/wupeiqi/articles/7552008.html
 	1.装饰器
 		
 	2.session&cookie原理
+	
+	3.根据类的地址找到并找到其中的大写静态文件,
+		import importlib
+		path="setting.Foo"
+		p,c=path.rsplite('.',maxsplit=1)
+		m=importlib.import_module(p)
+		cls=getattr(m,c)
+		for key in dir(cls):
+			if key.isupper():
+				print(key ,getattr(cls,key))
+				
 
 flask框架：
 	1.介绍Flask	Django Tornado框架
@@ -17,21 +28,259 @@ flask框架：
 	9.蓝图
 	10.请求拓展（Django中间件）
 	11.中间件
+	12.视图
+	13.特殊装饰器
 
 详细内容：
 
 1.介绍Flask	Django Tornado框架
-	Django：包含了非常多的组件：ORM，Form，
-
+	Django：包含了非常多的组件：ORM，Form，ModelForm等
+	Flask：短小精悍，内部没有太多的组件，第三方组件非常丰富
+	Tornado：异步非阻塞框架（node.js）
 
 2.Flask快速入门
+	a.安装
+		pip install flask
+	b.wsgi,
+
 3.配置文件
+	a.#app.config['DEBUG']=True   和下一行一样为不同配制方法
+		#通过传入不同的方法来实现不同状态下的功能
+	b.app.config.from_object("settings.Config")
+	
+		#settings文件
+		#通过调用该文件的不同的类来实现不同的方法
+		class Config(object):
+			DEBUG = False
+			TESTING = False
+			DATABASE_URI = 'sqlite://:memory:'
+		class ProductionConfig(Config):
+			DATABASE_URI = 'mysql://user@localhost/foo'
+		class DevelopmentConfig(Config):
+			DEBUG = True
+		class TestingConfig(Config):
+			TESTING = True
+
 4.路由系统
+	#endpoint='n1'相当于Django中的name，默认为函数名
+	@app.route('/index',methods=['GET','POST'],endpoint='n1')
+	def hello_world():
+		print(url_for('n1'))#返回n1的路径
+		return 'Hello World!'
+	
+	a.endpoint='n1' 相当于Django中的name，默认为函数名
+	b.url_for('n1') 反向生成url路径
+	c.动态路由：<int:nid>
+		@app.route('/index/<int:nid>',methods=['GET','POST'])
+		def hello_world(nid):#需传入路径中的参数nid
+			print(url_for('n1',nid=999))#返回n1的路径
+			return 'Hello World!'
+			
+		- 有4种类型，不写类型默认为字符串型
+			@app.route('/user/<username>')
+			@app.route('/post/<int:post_id>')
+			@app.route('/post/<float:post_id>')
+			@app.route('/post/<path:path>')
+12.视图FBV,CBV
+	-FBV
+
 5.模板语言
+	-基本数据类型：可以执行Python语法，如dict.get() list['xx']
+	-传入函数  Django自动执行  flask不自动执行
+	-Django中的makesafe在flask中为makeup 和模板中加{{xxx|safe}}
+	-flask 中的模板也可以使用函数{{func(6)}}这样调用
+	如果是以下写法写函数表示全局传参可以直接在模板中调用不需要传回模板	
+	-模板继承与Django一样
+	-全局自定义函数	
+		@app.template_global()
+		def sb(a1, a2):
+			return a1 + a2
+		#模板中调用 {{sb(1,2)}}
+
+		@app.template_filter()
+		def db(a1, a2, a3):
+			return a1 + a2 + a3
+		#模板中调用 {{ 1|db(2,3)}}
+	-宏，相当于函数，不调用时不显示
+	
+		{% macro input(name, type='text', value='') %}
+			<input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+		{% endmacro %}
+		#此时不显示，试用下一行语句调用才会显示
+		{{ input('n1') }}
+
 6.请求&响应相关
+	a. 请求相关信息
+        # request.method
+        # request.args
+        # request.form
+        # request.values
+        # request.cookies
+        # request.headers
+        # request.path
+        # request.full_path
+        # request.script_root
+        # request.url
+        # request.base_url
+        # request.url_root
+        # request.host_url
+        # request.host
+        # request.files
+        # obj = request.files['the_file_name']
+        # obj.save('/var/www/uploads/' + secure_filename(f.filename))
+
+    b. 响应相关信息
+        # return "字符串"
+        # return render_template('html模板路径',**{})
+        # return redirect('/index.html')
+		#也可以通过导入from flask import jsonify 返回json格式文本
+		# return jsonify({'k1':'v1'})
+		
+	c.其他
+        # response = make_response(render_template('index.html'))
+        
+		# response是flask.wrappers.Response类型需要引入from flask import make_response
+        # response.delete_cookie('key')
+		
+        # response.set_cookie('key', 'value')
+		
+        # response.headers['X-Something'] = 'A value'
+        # return response
+	
 7.Session&cookie
-8.闪现
+	a. 用户验证
+		- 方法一
+			from flask import Flask,redirect,render_template,request,session,url_for
+			from flask import jsonify,make_response
+			app = Flask(__name__)
+
+			app.config.from_object("settings.DevelopmentConfig")
+
+			STUDENT_DICT={
+				1:{'name':'王龙泰','age':'38','gender':'中'},
+				2:{'name':'小东北','age':'73','gender':'男'},
+				3:{'name':'田硕','age':'84','gender':'男'},
+			}
+			@app.route('/login',methods=['GET','POST'])
+			def login():
+				if request.method=='GET':
+					return render_template('login.html')
+				user=request.form.get('user')
+				pwd=request.form.get('pwd')
+				if user=='oldboy'and pwd=='666':
+					session['user']=user
+					return redirect('index')
+				return render_template('login.html',error='用户名或密码错误')
+
+			@app.route('/index')
+			def index():
+				if not session.get('user'):
+					return redirect(url_for('index'))
+				return render_template('index.html',stu_dic=STUDENT_DICT)
+			@app.route('/delete/<int:nid>')
+			def delete(nid):
+				if not session.get('user'):
+					return redirect(url_for('index'))
+				del STUDENT_DICT[nid]
+				return redirect(url_for('index'))
+
+			@app.route('/detail/<int:nid>')
+			def detail(nid):
+				if not session.get('user'):
+					return redirect(url_for('index'))
+				info = STUDENT_DICT[nid]
+				return render_template('detail.html',info=info)
+
+			if __name__ == '__main__':
+				app.run()
+			
+		- 方法二
+			def auth(func):
+			@functools.wraps(func) #表示使用使用该装饰器的方法的信息
+			def inner(*args,**kwargs):
+				if not session.get('user'):
+					return redirect(url_for('login'))
+				ret=func(*args,**kwargs)
+				return ret
+			return inner
+			@app.route('/index')
+			@auth
+			def index():
+				return render_template('index.html',stu_dic=STUDENT_DICT)
+			应用场景：比较少的函数中需要拓展
+		- 方法三 before_request 在所有函数运行前运行
+			@app.before_request
+			def xxxx():
+				if request.path=='/login': #如果访问该地址则返回空，即程序接着往下运行
+					return None
+				if session.get('user'):
+					return None
+				return  redirect('/login')
+	b.当请求刚到来：flask读取cookie中的session对应的值：eyJ1c2VyIjoib2xkYm95In0，将该值解密并反序列化成字典，放入内存
+	c.当请求结束时：flask会读取内存中的字典的值，进行序列化+加密，写入到用户cookie中
+		
+		'PERMANENT_SESSION_LIFETIME':timedelta(days=31),
+		'SESSION_COOKIE_NAME':                  'session',
+        'SESSION_COOKIE_DOMAIN':                None,
+        'SESSION_COOKIE_PATH':                  None,
+        'SESSION_COOKIE_HTTPONLY':              True,
+        'SESSION_COOKIE_SECURE':                False,
+        'SESSION_REFRESH_EACH_REQUEST':         True,	
+		#最后一条表示用户点击页面时session失效时间重新计算
+8.闪现 在session中存出一个数据，读取时通过pop将数据移除
+	- 访问page1时会生成session，此时访问page2时session还会生效
+		@app.route('/page1')
+		def page1():
+			session['uuuu']=123
+			flash('存储临时数据',category='error')
+			#表示临时放一次数据category='error'表示对其进行分类
+			return "session"\
+				   
+		@app.route('/page2')
+		def page2():
+			print(session['uuuu'])
+			print(get_flashed_messages(category_filter=['error']))
+			#get_flashed_messages()取一次就没有了category_filter表示失效某一类
+			#del session['uuuu']这两种方法可使session失效
+			#session.pop('uuuu')
+			return "session"
+	使用flash和get_flashed_messages需要导入该模块
+
 9.蓝图
 10.请求拓展（Django中间件）
+	Django中间件
+	https://www.cnblogs.com/wupeiqi/articles/5237704.html
 11.中间件
+	1.call方法在用户发出请求时才执行
+	2.要想使用中间件,可以在不修改flask文件的情况下在代码执行前运行某些内容
+		class Middleware(object):
+			def __init__(self,old)
+				self.old=old
+			def __call__(self,*args,**kwargs)
+				ret=self.old(*args,**kwargs)
+				return ret
+		if __name__ == '__main__':
+			app.wsgi_app=Middleware(app.wsgi_app)
+			app.run()
+
+	
+13.特殊装饰器
+	- before_request  	在所有函数运行前运行谁先定义谁先执行 如果中间某个有返回值就直接调回最早执行的after_request  @app.before_request
+	- after_request     在所有函数运行之后运行 有一个参数需要返回值return 谁后定义谁先执行
+	- before_first_request  只有启动起来第一次执行
+	- errorhandler   出现访问错误显示的页面，即定制错误页面
+		@app.errorhandler(404)
+		def page_not_found(error):
+			return 'This page does not exist', 404
+			
+	- app.template_global							@app.template_global()
+			def sb(a1, a2):
+				return a1 + a2
+			#模板中调用 {{sb(1,2)}}
+	- app.template_filter								@app.template_filter()
+			def db(a1, a2, a3):
+				return a1 + a2 + a3
+			#模板中调用 {{ 1|db(2,3)}}
+	
+
 
