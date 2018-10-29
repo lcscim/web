@@ -1,4 +1,5 @@
-https://www.cnblogs.com/wupeiqi/articles/7552008.html
+https://www.cnblogs.com/wupeiqi/articles/7552008.html flask
+https://www.cnblogs.com/wupeiqi/articles/5433893.html 目录
 
 回顾：
 	1.装饰器
@@ -14,7 +15,18 @@ https://www.cnblogs.com/wupeiqi/articles/7552008.html
 		for key in dir(cls):
 			if key.isupper():
 				print(key ,getattr(cls,key))
-				
+	4.wsgi 
+		WSGI（Web Server Gateway Interface）是一种规范，它定义了使用python编写的web app与web server之间接口格式，实现web app与web server间的解耦。
+		python标准库提供的独立WSGI服务器称为wsgiref。
+
+			from wsgiref.simple_server import make_server
+			def RunServer(environ, start_response):
+				start_response('200 OK', [('Content-Type', 'text/html')])
+				return [bytes('<h1>Hello, web!</h1>', encoding='utf-8'), ]
+			if __name__ == '__main__':
+				httpd = make_server('', 8000, RunServer)
+				print("Serving HTTP on port 8000...")
+				httpd.serve_forever()
 
 flask框架：
 	1.介绍Flask	Django Tornado框架
@@ -81,8 +93,130 @@ flask框架：
 			@app.route('/post/<int:post_id>')
 			@app.route('/post/<float:post_id>')
 			@app.route('/post/<path:path>')
+	d.自定义正则路由表达式
+		# 步骤一：定制类
+		from flask import Flask, views, url_for
+			#	导入模块
+		from werkzeug.routing import BaseConverter
+		app = Flask(import_name=__name__)
+		class RegexConverter(BaseConverter):
+			"""
+			自定义URL匹配正则表达式
+			"""
+			def __init__(self, map, regex):
+				super(RegexConverter, self).__init__(map)
+				self.regex = regex
+
+			def to_python(self, value):
+				"""
+				路由匹配时，匹配成功后传递给视图函数中参数的值
+				:param value: 
+				:return: 
+				"""
+				return int(value)
+			def to_url(self, value):
+				"""
+				使用url_for反向生成URL时，传递的参数经过该方法处理，返回的值用于生成URL中的参数
+				:param value: 
+				:return: 
+				"""
+				val = super(RegexConverter, self).to_url(value)
+				return val
+		# 步骤二：添加到flask转换器中
+		app.url_map.converters['regex'] = RegexConverter
+		# 步骤三：使用自定义正则
+		@app.route('/index/<regex("\d+"):nid>')
+		def index(nid):
+			print(url_for('index', nid='888'))
+			return 'Index'
+		if __name__ == '__main__':
+			app.run()
+
+14.路由+视图
+	a.路由设置的两种方式：
+		@app.route('/index')
+		def index():
+			return "index"
+
+
+		def log():
+			return "log"
+		app.add_url_rule("/login",None,log)
+	b.route参数
+	@app.route和app.add_url_rule参数：
+		rule,                       URL规则
+		view_func,                  视图函数名称
+		defaults=None,              默认值,当URL中无参数，函数需要参数时，使用defaults={'k':'v'}为函数提供参数
+		endpoint=None,              名称，用于反向生成URL，即： url_for('名称')
+		methods=None,               允许的请求方式，如：["GET","POST"]
+		
+		strict_slashes=None,        对URL最后的 / 符号是否严格要求，
+									如：
+										@app.route('/index',strict_slashes=False)，
+											访问 http://www.xx.com/index/ 或 http://www.xx.com/index均可
+										@app.route('/index',strict_slashes=True)
+											仅访问 http://www.xx.com/index 
+		redirect_to=None,           重定向到指定地址
+									如：
+										@app.route('/index/<int:nid>', redirect_to='/home/<nid>')
+										或
+										def func(adapter, nid):
+											return "/home/888"
+										@app.route('/index/<int:nid>', redirect_to=func)
+		subdomain=None,             子域名访问
+											from flask import Flask, views, url_for
+											app = Flask(import_name=__name__)
+											app.config['SERVER_NAME'] = 'wupeiqi.com:5000'
+
+											@app.route("/", subdomain="admin")
+											def static_index():
+												"""Flask supports static subdomains
+												This is available at static.your-domain.tld"""
+												return "static.your-domain.tld"
+
+											@app.route("/dynamic", subdomain="<username>")
+											def username_index(username):
+												"""Dynamic subdomains are also supported
+												Try going to user1.your-domain.tld/dynamic"""
+												return username + ".your-domain.tld"
+	c.注意
+		- 不要让endpoint重名
+		- 如果重名函数名也一定要相同
+	
 12.视图FBV,CBV
 	-FBV
+	-CBV
+		
+		from flask import Flask,views
+		app=Flask(__name__)
+		import functools
+
+		def wrapper(func):
+			@functools.wraps(func)
+			def inner(*args,**kwargs):
+				return func(*args,**kwargs)
+			return inner
+
+		@app.route('/index')
+		def index():
+			return "index"
+
+
+		def log():
+			return "log"
+		app.add_url_rule("/login",None,log)
+
+		class UsrView(views.MethodView):
+			methods=['GET']
+			decorators=[wrapper,]
+			def get(self,*args,**kwargs):
+				return "GET"
+			def post(self,*args,**kwargs):
+				return "POST"
+		app.add_url_rule('/user',None,UsrView.as_view('uuuu'))
+
+		if __name__ == '__main__':
+			app.run()
 
 5.模板语言
 	-基本数据类型：可以执行Python语法，如dict.get() list['xx']
@@ -247,6 +381,15 @@ flask框架：
 	使用flash和get_flashed_messages需要导入该模块
 
 9.蓝图
+	目标：给开发者提供一个目录结构
+	其他：
+		- 自定义模板静态文件
+			
+		- 给某一类的url添加前缀
+			
+			app.register_blueprint(ac,url_prefix='/admin')
+		- 给一类的url添加before_request
+
 10.请求拓展（Django中间件）
 	Django中间件
 	https://www.cnblogs.com/wupeiqi/articles/5237704.html
@@ -281,6 +424,72 @@ flask框架：
 			def db(a1, a2, a3):
 				return a1 + a2 + a3
 			#模板中调用 {{ 1|db(2,3)}}
-	
 
+14.threading_local
+	作用：为每一个线程创建一个独立的空间，使得线程对自己的空间的数据进行操作（数据隔离）
+	- 获取一个线程的唯一标记: threading.get_ident
+	- 根据字典定义一个类似于 threading_local的功能
+		import threading
+		import time
+		DIC={}
+		def task(i):
+			ident=threading.get_ident()
+			if ident in DIC:
+				DIC[ident]['xxxx']=i
+			else:
+				DIC[ident]={'xxxx':i}
+			time.sleep(2)
+			print(DIC[ident]['xxxx'],i)
+		for i in range(10):
+			t=threading.Thread(target=task,args=(i,))
+			t.start()
+	- 根据字典自定义一个为每个协程开辟空间进行存储数据
+		import threading
+		import time
+		import greenlet
+
+		DIC={}
+
+		def task(i):
+			ident=greenlet.getcurrent()
+			#ident=threading.get_ident()
+			if ident in DIC:
+			  DIC[ident]['xxxx']=i
+			else:
+				DIC[ident]={'xxxx':i}
+			time.sleep(2)
+			print(DIC[ident]['xxxx'],i)
+		for i in range(10):
+			t=threading.Thread(target=task,args=(i,))
+			t.start()
+	- 通过getattr/setattr构造出来threading.local的加强版（协程）
+		import threading
+		import time
+		import greenlet
+		try:
+			get_ident=greenlet.getcurrent
+		except Exception as e:
+			get_ident=threading.get_ident
+
+		class Local(object):
+			DIC={}
+			def __getattr__(self, item):
+				ident=get_ident()
+				if ident in self.DIC:
+					return self.DIC[ident].get(item)
+				return None
+			def __setattr__(self, key, value):
+				ident=get_ident()
+				if ident in self.DIC:
+					self.DIC[ident][key]=value
+				else:
+					self.DIC[ident]={key:value}
+		obj=Local()
+		def task(i):
+			obj.xxxx=i
+			time.sleep(2)
+			print(obj.xxxx,i)
+		for i in range(10):
+			t=threading.Thread(target=task,args=(i,))
+			t.start()
 
