@@ -30,3 +30,4 @@ def logout():
     if 'user_info' in session:
         del session['user_info']
     return redirect('/login')
+
