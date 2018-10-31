@@ -1,7 +1,8 @@
 https://www.cnblogs.com/wupeiqi/articles/7552008.html flask
 https://www.cnblogs.com/wupeiqi/articles/5433893.html 目录
+https://www.cnblogs.com/wupeiqi/articles/8184686.html DBUtils
 
-回顾：
+10.28之前回顾：
 	1.装饰器
 		
 	2.session&cookie原理
@@ -28,468 +29,520 @@ https://www.cnblogs.com/wupeiqi/articles/5433893.html 目录
 				print("Serving HTTP on port 8000...")
 				httpd.serve_forever()
 
-flask框架：
+	flask框架：
+		1.介绍Flask	Django Tornado框架
+		2.Flask快速入门
+		3.配置文件
+		4.路由系统
+		5.模板语言
+		6.请求&响应相关
+		7.Session&cookie
+		8.闪现
+		9.蓝图
+		10.请求拓展（Django中间件）
+		11.中间件
+		12.视图
+		13.特殊装饰器
+
+	详细内容：
+
 	1.介绍Flask	Django Tornado框架
+		Django：包含了非常多的组件：ORM，Form，ModelForm等
+		Flask：短小精悍，内部没有太多的组件，第三方组件非常丰富
+		Tornado：异步非阻塞框架（node.js）
+
 	2.Flask快速入门
+		a.安装
+			pip install flask
+		b.wsgi,
+
 	3.配置文件
+		a.#app.config['DEBUG']=True   和下一行一样为不同配制方法
+			#通过传入不同的方法来实现不同状态下的功能
+		b.app.config.from_object("settings.Config")
+		
+			#settings文件
+			#通过调用该文件的不同的类来实现不同的方法
+			class Config(object):
+				DEBUG = False
+				TESTING = False
+				DATABASE_URI = 'sqlite://:memory:'
+			class ProductionConfig(Config):
+				DATABASE_URI = 'mysql://user@localhost/foo'
+			class DevelopmentConfig(Config):
+				DEBUG = True
+			class TestingConfig(Config):
+				TESTING = True
+
 	4.路由系统
-	5.模板语言
-	6.请求&响应相关
-	7.Session&cookie
-	8.闪现
-	9.蓝图
-	10.请求拓展（Django中间件）
-	11.中间件
-	12.视图
-	13.特殊装饰器
-
-详细内容：
-
-1.介绍Flask	Django Tornado框架
-	Django：包含了非常多的组件：ORM，Form，ModelForm等
-	Flask：短小精悍，内部没有太多的组件，第三方组件非常丰富
-	Tornado：异步非阻塞框架（node.js）
-
-2.Flask快速入门
-	a.安装
-		pip install flask
-	b.wsgi,
-
-3.配置文件
-	a.#app.config['DEBUG']=True   和下一行一样为不同配制方法
-		#通过传入不同的方法来实现不同状态下的功能
-	b.app.config.from_object("settings.Config")
-	
-		#settings文件
-		#通过调用该文件的不同的类来实现不同的方法
-		class Config(object):
-			DEBUG = False
-			TESTING = False
-			DATABASE_URI = 'sqlite://:memory:'
-		class ProductionConfig(Config):
-			DATABASE_URI = 'mysql://user@localhost/foo'
-		class DevelopmentConfig(Config):
-			DEBUG = True
-		class TestingConfig(Config):
-			TESTING = True
-
-4.路由系统
-	#endpoint='n1'相当于Django中的name，默认为函数名
-	@app.route('/index',methods=['GET','POST'],endpoint='n1')
-	def hello_world():
-		print(url_for('n1'))#返回n1的路径
-		return 'Hello World!'
-	
-	a.endpoint='n1' 相当于Django中的name，默认为函数名
-	b.url_for('n1') 反向生成url路径
-	c.动态路由：<int:nid>
-		@app.route('/index/<int:nid>',methods=['GET','POST'])
-		def hello_world(nid):#需传入路径中的参数nid
-			print(url_for('n1',nid=999))#返回n1的路径
+		#endpoint='n1'相当于Django中的name，默认为函数名
+		@app.route('/index',methods=['GET','POST'],endpoint='n1')
+		def hello_world():
+			print(url_for('n1'))#返回n1的路径
 			return 'Hello World!'
+		
+		a.endpoint='n1' 相当于Django中的name，默认为函数名
+		b.url_for('n1') 反向生成url路径
+		c.动态路由：<int:nid>
+			@app.route('/index/<int:nid>',methods=['GET','POST'])
+			def hello_world(nid):#需传入路径中的参数nid
+				print(url_for('n1',nid=999))#返回n1的路径
+				return 'Hello World!'
+				
+			- 有4种类型，不写类型默认为字符串型
+				@app.route('/user/<username>')
+				@app.route('/post/<int:post_id>')
+				@app.route('/post/<float:post_id>')
+				@app.route('/post/<path:path>')
+		d.自定义正则路由表达式
+			# 步骤一：定制类
+			from flask import Flask, views, url_for
+				#	导入模块
+			from werkzeug.routing import BaseConverter
+			app = Flask(import_name=__name__)
+			class RegexConverter(BaseConverter):
+				"""
+				自定义URL匹配正则表达式
+				"""
+				def __init__(self, map, regex):
+					super(RegexConverter, self).__init__(map)
+					self.regex = regex
+
+				def to_python(self, value):
+					"""
+					路由匹配时，匹配成功后传递给视图函数中参数的值
+					:param value: 
+					:return: 
+					"""
+					return int(value)
+				def to_url(self, value):
+					"""
+					使用url_for反向生成URL时，传递的参数经过该方法处理，返回的值用于生成URL中的参数
+					:param value: 
+					:return: 
+					"""
+					val = super(RegexConverter, self).to_url(value)
+					return val
+			# 步骤二：添加到flask转换器中
+			app.url_map.converters['regex'] = RegexConverter
+			# 步骤三：使用自定义正则
+			@app.route('/index/<regex("\d+"):nid>')
+			def index(nid):
+				print(url_for('index', nid='888'))
+				return 'Index'
+			if __name__ == '__main__':
+				app.run()
+
+	14.路由+视图
+		a.路由设置的两种方式：
+			@app.route('/index')
+			def index():
+				return "index"
+
+
+			def log():
+				return "log"
+			app.add_url_rule("/login",None,log)
+		b.route参数
+		@app.route和app.add_url_rule参数：
+			rule,                       URL规则
+			view_func,                  视图函数名称
+			defaults=None,              默认值,当URL中无参数，函数需要参数时，使用defaults={'k':'v'}为函数提供参数
+			endpoint=None,              名称，用于反向生成URL，即： url_for('名称')
+			methods=None,               允许的请求方式，如：["GET","POST"]
 			
-		- 有4种类型，不写类型默认为字符串型
-			@app.route('/user/<username>')
-			@app.route('/post/<int:post_id>')
-			@app.route('/post/<float:post_id>')
-			@app.route('/post/<path:path>')
-	d.自定义正则路由表达式
-		# 步骤一：定制类
-		from flask import Flask, views, url_for
-			#	导入模块
-		from werkzeug.routing import BaseConverter
-		app = Flask(import_name=__name__)
-		class RegexConverter(BaseConverter):
-			"""
-			自定义URL匹配正则表达式
-			"""
-			def __init__(self, map, regex):
-				super(RegexConverter, self).__init__(map)
-				self.regex = regex
+			strict_slashes=None,        对URL最后的 / 符号是否严格要求，
+										如：
+											@app.route('/index',strict_slashes=False)，
+												访问 http://www.xx.com/index/ 或 http://www.xx.com/index均可
+											@app.route('/index',strict_slashes=True)
+												仅访问 http://www.xx.com/index 
+			redirect_to=None,           重定向到指定地址
+										如：
+											@app.route('/index/<int:nid>', redirect_to='/home/<nid>')
+											或
+											def func(adapter, nid):
+												return "/home/888"
+											@app.route('/index/<int:nid>', redirect_to=func)
+			subdomain=None,             子域名访问
+												from flask import Flask, views, url_for
+												app = Flask(import_name=__name__)
+												app.config['SERVER_NAME'] = 'wupeiqi.com:5000'
 
-			def to_python(self, value):
-				"""
-				路由匹配时，匹配成功后传递给视图函数中参数的值
-				:param value: 
-				:return: 
-				"""
-				return int(value)
-			def to_url(self, value):
-				"""
-				使用url_for反向生成URL时，传递的参数经过该方法处理，返回的值用于生成URL中的参数
-				:param value: 
-				:return: 
-				"""
-				val = super(RegexConverter, self).to_url(value)
-				return val
-		# 步骤二：添加到flask转换器中
-		app.url_map.converters['regex'] = RegexConverter
-		# 步骤三：使用自定义正则
-		@app.route('/index/<regex("\d+"):nid>')
-		def index(nid):
-			print(url_for('index', nid='888'))
-			return 'Index'
-		if __name__ == '__main__':
-			app.run()
+												@app.route("/", subdomain="admin")
+												def static_index():
+													"""Flask supports static subdomains
+													This is available at static.your-domain.tld"""
+													return "static.your-domain.tld"
 
-14.路由+视图
-	a.路由设置的两种方式：
-		@app.route('/index')
-		def index():
-			return "index"
-
-
-		def log():
-			return "log"
-		app.add_url_rule("/login",None,log)
-	b.route参数
-	@app.route和app.add_url_rule参数：
-		rule,                       URL规则
-		view_func,                  视图函数名称
-		defaults=None,              默认值,当URL中无参数，函数需要参数时，使用defaults={'k':'v'}为函数提供参数
-		endpoint=None,              名称，用于反向生成URL，即： url_for('名称')
-		methods=None,               允许的请求方式，如：["GET","POST"]
+												@app.route("/dynamic", subdomain="<username>")
+												def username_index(username):
+													"""Dynamic subdomains are also supported
+													Try going to user1.your-domain.tld/dynamic"""
+													return username + ".your-domain.tld"
+		c.注意
+			- 不要让endpoint重名
+			- 如果重名函数名也一定要相同
 		
-		strict_slashes=None,        对URL最后的 / 符号是否严格要求，
-									如：
-										@app.route('/index',strict_slashes=False)，
-											访问 http://www.xx.com/index/ 或 http://www.xx.com/index均可
-										@app.route('/index',strict_slashes=True)
-											仅访问 http://www.xx.com/index 
-		redirect_to=None,           重定向到指定地址
-									如：
-										@app.route('/index/<int:nid>', redirect_to='/home/<nid>')
-										或
-										def func(adapter, nid):
-											return "/home/888"
-										@app.route('/index/<int:nid>', redirect_to=func)
-		subdomain=None,             子域名访问
-											from flask import Flask, views, url_for
-											app = Flask(import_name=__name__)
-											app.config['SERVER_NAME'] = 'wupeiqi.com:5000'
+	12.视图FBV,CBV
+		-FBV
+		-CBV
+			
+			from flask import Flask,views
+			app=Flask(__name__)
+			import functools
 
-											@app.route("/", subdomain="admin")
-											def static_index():
-												"""Flask supports static subdomains
-												This is available at static.your-domain.tld"""
-												return "static.your-domain.tld"
-
-											@app.route("/dynamic", subdomain="<username>")
-											def username_index(username):
-												"""Dynamic subdomains are also supported
-												Try going to user1.your-domain.tld/dynamic"""
-												return username + ".your-domain.tld"
-	c.注意
-		- 不要让endpoint重名
-		- 如果重名函数名也一定要相同
-	
-12.视图FBV,CBV
-	-FBV
-	-CBV
-		
-		from flask import Flask,views
-		app=Flask(__name__)
-		import functools
-
-		def wrapper(func):
-			@functools.wraps(func)
-			def inner(*args,**kwargs):
-				return func(*args,**kwargs)
-			return inner
-
-		@app.route('/index')
-		def index():
-			return "index"
-
-
-		def log():
-			return "log"
-		app.add_url_rule("/login",None,log)
-
-		class UsrView(views.MethodView):
-			methods=['GET']
-			decorators=[wrapper,]
-			def get(self,*args,**kwargs):
-				return "GET"
-			def post(self,*args,**kwargs):
-				return "POST"
-		app.add_url_rule('/user',None,UsrView.as_view('uuuu'))
-
-		if __name__ == '__main__':
-			app.run()
-
-5.模板语言
-	-基本数据类型：可以执行Python语法，如dict.get() list['xx']
-	-传入函数  Django自动执行  flask不自动执行
-	-Django中的makesafe在flask中为makeup 和模板中加{{xxx|safe}}
-	-flask 中的模板也可以使用函数{{func(6)}}这样调用
-	如果是以下写法写函数表示全局传参可以直接在模板中调用不需要传回模板	
-	-模板继承与Django一样
-	-全局自定义函数	
-		@app.template_global()
-		def sb(a1, a2):
-			return a1 + a2
-		#模板中调用 {{sb(1,2)}}
-
-		@app.template_filter()
-		def db(a1, a2, a3):
-			return a1 + a2 + a3
-		#模板中调用 {{ 1|db(2,3)}}
-	-宏，相当于函数，不调用时不显示
-	
-		{% macro input(name, type='text', value='') %}
-			<input type="{{ type }}" name="{{ name }}" value="{{ value }}">
-		{% endmacro %}
-		#此时不显示，试用下一行语句调用才会显示
-		{{ input('n1') }}
-
-6.请求&响应相关
-	a. 请求相关信息
-        # request.method
-        # request.args
-        # request.form
-        # request.values
-        # request.cookies
-        # request.headers
-        # request.path
-        # request.full_path
-        # request.script_root
-        # request.url
-        # request.base_url
-        # request.url_root
-        # request.host_url
-        # request.host
-        # request.files
-        # obj = request.files['the_file_name']
-        # obj.save('/var/www/uploads/' + secure_filename(f.filename))
-
-    b. 响应相关信息
-        # return "字符串"
-        # return render_template('html模板路径',**{})
-        # return redirect('/index.html')
-		#也可以通过导入from flask import jsonify 返回json格式文本
-		# return jsonify({'k1':'v1'})
-		
-	c.其他
-        # response = make_response(render_template('index.html'))
-        
-		# response是flask.wrappers.Response类型需要引入from flask import make_response
-        # response.delete_cookie('key')
-		
-        # response.set_cookie('key', 'value')
-		
-        # response.headers['X-Something'] = 'A value'
-        # return response
-	
-7.Session&cookie
-	a. 用户验证
-		- 方法一
-			from flask import Flask,redirect,render_template,request,session,url_for
-			from flask import jsonify,make_response
-			app = Flask(__name__)
-
-			app.config.from_object("settings.DevelopmentConfig")
-
-			STUDENT_DICT={
-				1:{'name':'王龙泰','age':'38','gender':'中'},
-				2:{'name':'小东北','age':'73','gender':'男'},
-				3:{'name':'田硕','age':'84','gender':'男'},
-			}
-			@app.route('/login',methods=['GET','POST'])
-			def login():
-				if request.method=='GET':
-					return render_template('login.html')
-				user=request.form.get('user')
-				pwd=request.form.get('pwd')
-				if user=='oldboy'and pwd=='666':
-					session['user']=user
-					return redirect('index')
-				return render_template('login.html',error='用户名或密码错误')
+			def wrapper(func):
+				@functools.wraps(func)
+				def inner(*args,**kwargs):
+					return func(*args,**kwargs)
+				return inner
 
 			@app.route('/index')
 			def index():
-				if not session.get('user'):
-					return redirect(url_for('index'))
-				return render_template('index.html',stu_dic=STUDENT_DICT)
-			@app.route('/delete/<int:nid>')
-			def delete(nid):
-				if not session.get('user'):
-					return redirect(url_for('index'))
-				del STUDENT_DICT[nid]
-				return redirect(url_for('index'))
+				return "index"
 
-			@app.route('/detail/<int:nid>')
-			def detail(nid):
-				if not session.get('user'):
-					return redirect(url_for('index'))
-				info = STUDENT_DICT[nid]
-				return render_template('detail.html',info=info)
+
+			def log():
+				return "log"
+			app.add_url_rule("/login",None,log)
+
+			class UsrView(views.MethodView):
+				methods=['GET']
+				decorators=[wrapper,]
+				def get(self,*args,**kwargs):
+					return "GET"
+				def post(self,*args,**kwargs):
+					return "POST"
+			app.add_url_rule('/user',None,UsrView.as_view('uuuu'))
 
 			if __name__ == '__main__':
 				app.run()
-			
-		- 方法二
-			def auth(func):
-			@functools.wraps(func) #表示使用使用该装饰器的方法的信息
-			def inner(*args,**kwargs):
-				if not session.get('user'):
-					return redirect(url_for('login'))
-				ret=func(*args,**kwargs)
-				return ret
-			return inner
-			@app.route('/index')
-			@auth
-			def index():
-				return render_template('index.html',stu_dic=STUDENT_DICT)
-			应用场景：比较少的函数中需要拓展
-		- 方法三 before_request 在所有函数运行前运行
-			@app.before_request
-			def xxxx():
-				if request.path=='/login': #如果访问该地址则返回空，即程序接着往下运行
-					return None
-				if session.get('user'):
-					return None
-				return  redirect('/login')
-	b.当请求刚到来：flask读取cookie中的session对应的值：eyJ1c2VyIjoib2xkYm95In0，将该值解密并反序列化成字典，放入内存
-	c.当请求结束时：flask会读取内存中的字典的值，进行序列化+加密，写入到用户cookie中
-		
-		'PERMANENT_SESSION_LIFETIME':timedelta(days=31),
-		'SESSION_COOKIE_NAME':                  'session',
-        'SESSION_COOKIE_DOMAIN':                None,
-        'SESSION_COOKIE_PATH':                  None,
-        'SESSION_COOKIE_HTTPONLY':              True,
-        'SESSION_COOKIE_SECURE':                False,
-        'SESSION_REFRESH_EACH_REQUEST':         True,	
-		#最后一条表示用户点击页面时session失效时间重新计算
-8.闪现 在session中存出一个数据，读取时通过pop将数据移除
-	- 访问page1时会生成session，此时访问page2时session还会生效
-		@app.route('/page1')
-		def page1():
-			session['uuuu']=123
-			flash('存储临时数据',category='error')
-			#表示临时放一次数据category='error'表示对其进行分类
-			return "session"\
-				   
-		@app.route('/page2')
-		def page2():
-			print(session['uuuu'])
-			print(get_flashed_messages(category_filter=['error']))
-			#get_flashed_messages()取一次就没有了category_filter表示失效某一类
-			#del session['uuuu']这两种方法可使session失效
-			#session.pop('uuuu')
-			return "session"
-	使用flash和get_flashed_messages需要导入该模块
 
-9.蓝图
-	目标：给开发者提供一个目录结构
-	其他：
-		- 自定义模板静态文件
-			
-		- 给某一类的url添加前缀
-			
-			app.register_blueprint(ac,url_prefix='/admin')
-		- 给一类的url添加before_request
-
-10.请求拓展（Django中间件）
-	Django中间件
-	https://www.cnblogs.com/wupeiqi/articles/5237704.html
-11.中间件
-	1.call方法在用户发出请求时才执行
-	2.要想使用中间件,可以在不修改flask文件的情况下在代码执行前运行某些内容
-		class Middleware(object):
-			def __init__(self,old)
-				self.old=old
-			def __call__(self,*args,**kwargs)
-				ret=self.old(*args,**kwargs)
-				return ret
-		if __name__ == '__main__':
-			app.wsgi_app=Middleware(app.wsgi_app)
-			app.run()
-
-	
-13.特殊装饰器
-	- before_request  	在所有函数运行前运行谁先定义谁先执行 如果中间某个有返回值就直接调回最早执行的after_request  @app.before_request
-	- after_request     在所有函数运行之后运行 有一个参数需要返回值return 谁后定义谁先执行
-	- before_first_request  只有启动起来第一次执行
-	- errorhandler   出现访问错误显示的页面，即定制错误页面
-		@app.errorhandler(404)
-		def page_not_found(error):
-			return 'This page does not exist', 404
-			
-	- app.template_global							@app.template_global()
+	5.模板语言
+		-基本数据类型：可以执行Python语法，如dict.get() list['xx']
+		-传入函数  Django自动执行  flask不自动执行
+		-Django中的makesafe在flask中为makeup 和模板中加{{xxx|safe}}
+		-flask 中的模板也可以使用函数{{func(6)}}这样调用
+		如果是以下写法写函数表示全局传参可以直接在模板中调用不需要传回模板	
+		-模板继承与Django一样
+		-全局自定义函数	
+			@app.template_global()
 			def sb(a1, a2):
 				return a1 + a2
 			#模板中调用 {{sb(1,2)}}
-	- app.template_filter								@app.template_filter()
+
+			@app.template_filter()
 			def db(a1, a2, a3):
 				return a1 + a2 + a3
 			#模板中调用 {{ 1|db(2,3)}}
+		-宏，相当于函数，不调用时不显示
+		
+			{% macro input(name, type='text', value='') %}
+				<input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+			{% endmacro %}
+			#此时不显示，试用下一行语句调用才会显示
+			{{ input('n1') }}
 
-14.threading_local
-	作用：为每一个线程创建一个独立的空间，使得线程对自己的空间的数据进行操作（数据隔离）
-	- 获取一个线程的唯一标记: threading.get_ident
-	- 根据字典定义一个类似于 threading_local的功能
-		import threading
-		import time
-		DIC={}
-		def task(i):
-			ident=threading.get_ident()
-			if ident in DIC:
-				DIC[ident]['xxxx']=i
-			else:
-				DIC[ident]={'xxxx':i}
-			time.sleep(2)
-			print(DIC[ident]['xxxx'],i)
-		for i in range(10):
-			t=threading.Thread(target=task,args=(i,))
-			t.start()
-	- 根据字典自定义一个为每个协程开辟空间进行存储数据
-		import threading
-		import time
-		import greenlet
+	6.请求&响应相关
+		a. 请求相关信息
+			# request.method
+			# request.args
+			# request.form
+			# request.values
+			# request.cookies
+			# request.headers
+			# request.path
+			# request.full_path
+			# request.script_root
+			# request.url
+			# request.base_url
+			# request.url_root
+			# request.host_url
+			# request.host
+			# request.files
+			# obj = request.files['the_file_name']
+			# obj.save('/var/www/uploads/' + secure_filename(f.filename))
 
-		DIC={}
+		b. 响应相关信息
+			# return "字符串"
+			# return render_template('html模板路径',**{})
+			# return redirect('/index.html')
+			#也可以通过导入from flask import jsonify 返回json格式文本
+			# return jsonify({'k1':'v1'})
+			
+		c.其他
+			# response = make_response(render_template('index.html'))
+			
+			# response是flask.wrappers.Response类型需要引入from flask import make_response
+			# response.delete_cookie('key')
+			
+			# response.set_cookie('key', 'value')
+			
+			# response.headers['X-Something'] = 'A value'
+			# return response
+		
+	7.Session&cookie
+		a. 用户验证
+			- 方法一
+				from flask import Flask,redirect,render_template,request,session,url_for
+				from flask import jsonify,make_response
+				app = Flask(__name__)
 
-		def task(i):
-			ident=greenlet.getcurrent()
-			#ident=threading.get_ident()
-			if ident in DIC:
-			  DIC[ident]['xxxx']=i
-			else:
-				DIC[ident]={'xxxx':i}
-			time.sleep(2)
-			print(DIC[ident]['xxxx'],i)
-		for i in range(10):
-			t=threading.Thread(target=task,args=(i,))
-			t.start()
-	- 通过getattr/setattr构造出来threading.local的加强版（协程）
-		import threading
-		import time
-		import greenlet
-		try:
-			get_ident=greenlet.getcurrent
-		except Exception as e:
-			get_ident=threading.get_ident
+				app.config.from_object("settings.DevelopmentConfig")
 
-		class Local(object):
+				STUDENT_DICT={
+					1:{'name':'王龙泰','age':'38','gender':'中'},
+					2:{'name':'小东北','age':'73','gender':'男'},
+					3:{'name':'田硕','age':'84','gender':'男'},
+				}
+				@app.route('/login',methods=['GET','POST'])
+				def login():
+					if request.method=='GET':
+						return render_template('login.html')
+					user=request.form.get('user')
+					pwd=request.form.get('pwd')
+					if user=='oldboy'and pwd=='666':
+						session['user']=user
+						return redirect('index')
+					return render_template('login.html',error='用户名或密码错误')
+
+				@app.route('/index')
+				def index():
+					if not session.get('user'):
+						return redirect(url_for('index'))
+					return render_template('index.html',stu_dic=STUDENT_DICT)
+				@app.route('/delete/<int:nid>')
+				def delete(nid):
+					if not session.get('user'):
+						return redirect(url_for('index'))
+					del STUDENT_DICT[nid]
+					return redirect(url_for('index'))
+
+				@app.route('/detail/<int:nid>')
+				def detail(nid):
+					if not session.get('user'):
+						return redirect(url_for('index'))
+					info = STUDENT_DICT[nid]
+					return render_template('detail.html',info=info)
+
+				if __name__ == '__main__':
+					app.run()
+				
+			- 方法二
+				def auth(func):
+				@functools.wraps(func) #表示使用使用该装饰器的方法的信息
+				def inner(*args,**kwargs):
+					if not session.get('user'):
+						return redirect(url_for('login'))
+					ret=func(*args,**kwargs)
+					return ret
+				return inner
+				@app.route('/index')
+				@auth
+				def index():
+					return render_template('index.html',stu_dic=STUDENT_DICT)
+				应用场景：比较少的函数中需要拓展
+			- 方法三 before_request 在所有函数运行前运行
+				@app.before_request
+				def xxxx():
+					if request.path=='/login': #如果访问该地址则返回空，即程序接着往下运行
+						return None
+					if session.get('user'):
+						return None
+					return  redirect('/login')
+		b.当请求刚到来：flask读取cookie中的session对应的值：eyJ1c2VyIjoib2xkYm95In0，将该值解密并反序列化成字典，放入内存
+		c.当请求结束时：flask会读取内存中的字典的值，进行序列化+加密，写入到用户cookie中
+			
+			'PERMANENT_SESSION_LIFETIME':timedelta(days=31),
+			'SESSION_COOKIE_NAME':                  'session',
+			'SESSION_COOKIE_DOMAIN':                None,
+			'SESSION_COOKIE_PATH':                  None,
+			'SESSION_COOKIE_HTTPONLY':              True,
+			'SESSION_COOKIE_SECURE':                False,
+			'SESSION_REFRESH_EACH_REQUEST':         True,	
+			#最后一条表示用户点击页面时session失效时间重新计算
+	8.闪现 在session中存出一个数据，读取时通过pop将数据移除
+		- 访问page1时会生成session，此时访问page2时session还会生效
+			@app.route('/page1')
+			def page1():
+				session['uuuu']=123
+				flash('存储临时数据',category='error')
+				#表示临时放一次数据category='error'表示对其进行分类
+				return "session"\
+					   
+			@app.route('/page2')
+			def page2():
+				print(session['uuuu'])
+				print(get_flashed_messages(category_filter=['error']))
+				#get_flashed_messages()取一次就没有了category_filter表示失效某一类
+				#del session['uuuu']这两种方法可使session失效
+				#session.pop('uuuu')
+				return "session"
+		使用flash和get_flashed_messages需要导入该模块
+
+	9.蓝图
+		目标：给开发者提供一个目录结构
+		其他：
+			- 自定义模板静态文件
+				
+			- 给某一类的url添加前缀
+				
+				app.register_blueprint(ac,url_prefix='/admin')
+			- 给一类的url添加before_request
+
+	10.请求拓展（Django中间件）
+		Django中间件
+		https://www.cnblogs.com/wupeiqi/articles/5237704.html
+	11.中间件
+		1.call方法在用户发出请求时才执行
+		2.要想使用中间件,可以在不修改flask文件的情况下在代码执行前运行某些内容
+			class Middleware(object):
+				def __init__(self,old)
+					self.old=old
+				def __call__(self,*args,**kwargs)
+					ret=self.old(*args,**kwargs)
+					return ret
+			if __name__ == '__main__':
+				app.wsgi_app=Middleware(app.wsgi_app)
+				app.run()
+
+		
+	13.特殊装饰器
+		- before_request  	在所有函数运行前运行谁先定义谁先执行 如果中间某个有返回值就直接调回最早执行的after_request  @app.before_request
+		- after_request     在所有函数运行之后运行 有一个参数需要返回值return 谁后定义谁先执行
+		- before_first_request  只有启动起来第一次执行
+		- errorhandler   出现访问错误显示的页面，即定制错误页面
+			@app.errorhandler(404)
+			def page_not_found(error):
+				return 'This page does not exist', 404
+				
+		- app.template_global							@app.template_global()
+				def sb(a1, a2):
+					return a1 + a2
+				#模板中调用 {{sb(1,2)}}
+		- app.template_filter								@app.template_filter()
+				def db(a1, a2, a3):
+					return a1 + a2 + a3
+				#模板中调用 {{ 1|db(2,3)}}
+
+	14.threading_local
+		作用：为每一个线程创建一个独立的空间，使得线程对自己的空间的数据进行操作（数据隔离）
+		- 获取一个线程的唯一标记: threading.get_ident
+		- 根据字典定义一个类似于 threading_local的功能
+			import threading
+			import time
 			DIC={}
-			def __getattr__(self, item):
-				ident=get_ident()
-				if ident in self.DIC:
-					return self.DIC[ident].get(item)
-				return None
-			def __setattr__(self, key, value):
-				ident=get_ident()
-				if ident in self.DIC:
-					self.DIC[ident][key]=value
+			def task(i):
+				ident=threading.get_ident()
+				if ident in DIC:
+					DIC[ident]['xxxx']=i
 				else:
-					self.DIC[ident]={key:value}
-		obj=Local()
-		def task(i):
-			obj.xxxx=i
-			time.sleep(2)
-			print(obj.xxxx,i)
-		for i in range(10):
-			t=threading.Thread(target=task,args=(i,))
-			t.start()
+					DIC[ident]={'xxxx':i}
+				time.sleep(2)
+				print(DIC[ident]['xxxx'],i)
+			for i in range(10):
+				t=threading.Thread(target=task,args=(i,))
+				t.start()
+		- 根据字典自定义一个为每个协程开辟空间进行存储数据
+			import threading
+			import time
+			import greenlet
 
+			DIC={}
+
+			def task(i):
+				ident=greenlet.getcurrent()
+				#ident=threading.get_ident()
+				if ident in DIC:
+				  DIC[ident]['xxxx']=i
+				else:
+					DIC[ident]={'xxxx':i}
+				time.sleep(2)
+				print(DIC[ident]['xxxx'],i)
+			for i in range(10):
+				t=threading.Thread(target=task,args=(i,))
+				t.start()
+		- 通过getattr/setattr构造出来threading.local的加强版（协程）
+			import threading
+			import time
+			import greenlet
+			try:
+				get_ident=greenlet.getcurrent
+			except Exception as e:
+				get_ident=threading.get_ident
+
+			class Local(object):
+				DIC={}
+				def __getattr__(self, item):
+					ident=get_ident()
+					if ident in self.DIC:
+						return self.DIC[ident].get(item)
+					return None
+				def __setattr__(self, key, value):
+					ident=get_ident()
+					if ident in self.DIC:
+						self.DIC[ident][key]=value
+					else:
+						self.DIC[ident]={key:value}
+			obj=Local()
+			def task(i):
+				obj.xxxx=i
+				time.sleep(2)
+				print(obj.xxxx,i)
+			for i in range(10):
+				t=threading.Thread(target=task,args=(i,))
+				t.start()
+	15.上下文管理
+		请求到来时
+	
+
+10.29
+	1.first
+		- 偏函数
+			import functools
+
+			def index(a1,a2):
+				return a1+a2
+			#原来的调用方式
+			ret=index(1,23)
+			print(ret)
+
+			#偏函数，帮助开发者自动传递参数
+			new_func=functools.partial(index,666)
+			ret=new_func(1)
+			print(ret)
+	2.上下文管理request
+
+	3.上下文管理session
+
+10.31 
+
+1.数据库&前端
+	1. 什么是响应式布局
+		@media属性
+		- 响应式 @media (Max-wide:700px){ ... } 表示窗口宽度小于700px时加载大括号中的样式
+		- css属性min-width: 1190px;表示当浏览器窗口宽度小于1190px时会在屏幕下方出现滚动条
+		- css属性overflow: scroll;表示当内容超出窗口长度出现滚动条
+	2. MySQL数据库
+		- 引擎
+			- innodb
+				-支持事务
+				#事务用于将某些操作的多个SQL作为原子性操作，一旦有某一个出现错误，即可回滚到原来的状态，从而保证数据库数据完整性。
+				-锁
+					-行锁
+					-表锁
+					-示例
+						-终端
+							begin；
+							select xx from xx for update;
+							commit;
+							#此时表示上锁其他无法访问，只有使用commit提交后才正常
+			- mysaim
+				-不支持事务
+				-锁
+					-表锁
+				-速度快
+				
+		
+		
