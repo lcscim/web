@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+<body>
+<form method="post" novalidate>
+    <p>用户名：{{form.name}}</p>{{form.name.errors[0]}}
+    <p>密码：{{form.pwd}}</p>{{form.pwd.errors[0]}}
+    <p><input type="submit" value="提交"></p>
+</form>
+
+
+</body>
+</html>

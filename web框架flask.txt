@@ -1,6 +1,8 @@
 https://www.cnblogs.com/wupeiqi/articles/7552008.html flask
 https://www.cnblogs.com/wupeiqi/articles/5433893.html 目录
 https://www.cnblogs.com/wupeiqi/articles/8184686.html DBUtils
+https://www.cnblogs.com/wupeiqi/articles/8202357.html wtforms
+
 
 10.28之前回顾：
 	1.装饰器
@@ -512,10 +514,40 @@ https://www.cnblogs.com/wupeiqi/articles/8184686.html DBUtils
 			new_func=functools.partial(index,666)
 			ret=new_func(1)
 			print(ret)
-	2.上下文管理request
+	2.上下文管理request，session
+		
+		第一阶段：请求到来
+			将request和session相关数据封装到ctx=RequestContent对象中
+			再通过LocalStack将ctx添加到Local中
+			__storage__={
+				1231:{'stack':[ctx(request,session)]}
+			}
+		第二阶段：视图函数中获取request或session
+			方式一：直接找LocalStack获取
+				from flask.globals import _request_ctx_stack
+				print(_request_ctx_stack.top.request.method)
+			方式二：通过代理LocalProxy获取
+				from flask import Flask,request
+				print(request.method)
 
-	3.上下文管理session
+10.30 flask之上下文管理				
+	简单来说，falsk上下文管理可以分为三个阶段：
+	　　1、请求进来时，
+			将请求鞋底的相关数据放入上下文管理中进行管理
+	　　2、在视图函数中，
+			要去上下文管理中取值
+	　　3、请求响应之后，
+			要将上下文管理中的数据清除
+	　　
+	详细点来说：
+	　　1、请求刚进来，
+			将request，session封装在RequestContext类中，app，g封装在AppContext类中，并通过LocalStack将requestcontext和appcontext放入Local类中
+	　　2、视图函数中，
+			通过localproxy--->偏函数--->localstack--->local取值
+	　　3、请求相应时，
+			先执行save.session()再各自执行pop(),将local中的数据清除
 
+	g 作为 flask 程序全局的一个临时变量,充当者中间媒介的作用,我们可以通过它传递一些数据，g 保存的是当前请求的全局变量，不同的请求会有不同的全局变量，通过不同的thread id区别
 10.31 
 
 1.数据库&前端
@@ -538,6 +570,11 @@ https://www.cnblogs.com/wupeiqi/articles/8184686.html DBUtils
 							select xx from xx for update;
 							commit;
 							#此时表示上锁其他无法访问，只有使用commit提交后才正常
+						-pymysql
+							cursor.execute('select xx from xx for update')
+						-django
+							with trancation.automic():
+								models.User.object.all().for_update()
 			- mysaim
 				-不支持事务
 				-锁
