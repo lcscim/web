@@ -1,8 +1,8 @@
 https://www.cnblogs.com/wupeiqi/articles/7552008.html flask
 https://www.cnblogs.com/wupeiqi/articles/5433893.html 目录
 https://www.cnblogs.com/wupeiqi/articles/8184686.html DBUtils
-https://www.cnblogs.com/wupeiqi/articles/8202357.html wtforms
-
+https://www.cnblogs.com/wupeiqi/articles/8202357.html wtforms 
+https://www.cnblogs.com/wupeiqi/articles/8259356.html SQLAlchemy
 
 10.28之前回顾：
 	1.装饰器
@@ -581,5 +581,26 @@ https://www.cnblogs.com/wupeiqi/articles/8202357.html wtforms
 					-表锁
 				-速度快
 				
-		
-		
+11.2
+1.SQLAlchemy
+	- SQLAlchemy,ORM（关系对象映射）
+	- 数据库：
+		-原生：
+			-MySQLdb:只支持Python2
+			-pymysql:支持Python2/3
+			https://www.cnblogs.com/wupeiqi/articles/5095821.html
+		-ORM框架
+			-SQLAlchemy
+				https://www.cnblogs.com/wupeiqi/articles/8259356.html
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
