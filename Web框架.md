@@ -600,3 +600,28 @@ https://www.cnblogs.com/wupeiqi/articles/6144178.html
 
 	*args是可变参数，args接收的是一个tuple；
 	**kw是关键字参数，kw接收的是一个dict。
+	
+- 使用自带的后台管理模块
+	设置自带后台管理框架密码：Python manage.py createsuperuser
+
+	在admin.py的文件中导入models包，并注册
+		from django.contrib import admin
+		from .models import Article
+		admin.site.register(Article)
+	修改数据默认显示的名称，在3.x版本是__str__,在2.7是__unicode__
+		def __str__(self):
+			return self.title
+			
+- 其他语句
+
+	Django-admin startproject +项目名    创建项目
+	
+	python manage.py runserver +端口		运行
+　　python manage.py startapp +appname		创建新的小APP
+　　python manage.py syncdb
+　　python manage.py makemigrations
+　　python manage.py migrate
+
+　　python manage.py createsuperuser
+- 将Django admin改为中文在settings中改成以下内容
+	LANGUAGE_CODE = 'zh-Hans'
