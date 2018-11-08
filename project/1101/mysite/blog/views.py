@@ -3,7 +3,7 @@ from .models import Blog,BlogType
 
 def blog_list(request):
     context=Blog.objects.all()
-    return render(request,'blog_list.html',{'context':context,})
+    return render(request, 'blog_list.html', {'context':context, })
 
 def blog_detail(request,blog_pk):
 
@@ -12,6 +12,5 @@ def blog_detail(request,blog_pk):
 
 def blogs_with_type(request,blog_type_pk):
     blog_type=BlogType.objects.filter(pk=blog_type_pk).first()
-    print(blog_type)
-    context=Blog.objects.first(blog_type=blog_type)
-    return render(request,'blogs_with_type.html',{'context':context,})
+    context=Blog.objects.filter(blog_type=blog_type)
+    return render(request, 'blogs_with_type.html', {'context':context,'blog_type':blog_type,})

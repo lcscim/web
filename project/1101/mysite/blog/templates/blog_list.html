@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    我的网站
+{% endblock %}
+
+{% block content %}
+    {% for blog in context %}
+    <a href="{% url 'blog_detail' blog.pk %}">
+        <h3>{{ blog.title }}</h3>
+    </a>
+
+    <p>{{ blog.content|truncatechars:50 }}</p>
+    {% empty %}
+        <p>----------暂无内容----------</p>
+    {% endfor %}
+    <p>一共有{{ context|length }}篇博客</p>
+{% endblock %}
+
+
