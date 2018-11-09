@@ -3,24 +3,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}
-    
-    {% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'base.css' %}">
-    {% block header_extends %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    {% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-4.1.3/css/bootstrap.min.css' %}">
+
+    {% block header_extends %}{% endblock %}
 </head>
 <body>
-<div class="nav">
-    <a class="logo" href="{% url 'home' %}">
-        <h1>个人博客网站</h1>
-    </a>
-    <a href="/">首页</a>
-    <a href="{% url 'blog_list' %}">博客</a>
-</div>
-{% block content %}
 
-{% endblock %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="{% url 'home' %}">个人博客网站</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item{% block nav_home_active %}
+            
+            {% endblock %}">
+                <a class="nav-link" href="/">首页</a>
+            </li>
+            <li class="nav-item{% block nav_blog_active %}
+            
+            {% endblock %}">
+                <a class="nav-link" href="{% url 'blog_list' %}">博客</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div style="margin-top: 70px">
+    {% block content %}
+
+    {% endblock %}
+</div>
+
+
+<script type="text/javascript" src="{% static 'jquery-3.3.1.slim.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap-4.1.3/js/bootstrap.min.js' %}"></script>
+
 </body>
 </html>

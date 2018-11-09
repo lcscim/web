@@ -3,7 +3,8 @@ from .models import Blog,BlogType
 
 def blog_list(request):
     context=Blog.objects.all()
-    return render(request, 'blog_list.html', {'context':context, })
+    blog_type=BlogType.objects.all()
+    return render(request, 'blog_list.html', {'context':context,'blog_types':blog_type})
 
 def blog_detail(request,blog_pk):
 

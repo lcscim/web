@@ -1,0 +1,14 @@
+div.blog-message p{
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 0.7em;
+}
+div.blog-message+p:not(:last-child){
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+div.blog-message-content p:not(:last-child){
+    display: inline-block;
+    margin-right: 10px;
+}

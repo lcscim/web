@@ -4,6 +4,10 @@
     {{ context.blog_type }}
 {% endblock %}
 
+{% block nav_blog_active %}
+active
+{% endblock %}
+
 {% block content %}
     <h2>{{ blog_type }}</h2>
     {% for blog in context %}

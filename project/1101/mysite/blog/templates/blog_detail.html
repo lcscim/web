@@ -1,16 +1,31 @@
 {% extends 'base.html' %}
-
+{% load staticfiles %}
 {% block title %}
     {{ context.title }}
 {% endblock %}
 
+{% block nav_blog_active %}
+    active
+{% endblock %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'blog/blog.css' %}">
+{% endblock %}
+
 {% block content %}
-    <h3>{{ context.title }}</h3>
-    <p>作者：{{ context.author }}</p>
-    <p>发表日期：{{ context.created_time|date:"Y-m-d G:n:s" }}</p>
-    <p>分类：
-        <a href="{% url 'blogs_with_type' context.blog_type.pk %}">{{ context.blog_type }}</a></p>
-    <p>{{ context.content }}</p>
+
+    <div class="col-10 offset-1 blog-message-content">
+        <h3>{{ context.title }}</h3>
+        <p>作者：{{ context.author }}</p>
+        <p>发表日期：{{ context.created_time|date:"Y-m-d G:n:s" }}</p>
+        <p>分类：
+            <a href="{% url 'blogs_with_type' context.blog_type.pk %}">{{ context.blog_type }}</a>
+        </p>
+        <br>
+        <p>{{ context.content }}</p>
+    </div>
+
+
 {% endblock %}
 
 
