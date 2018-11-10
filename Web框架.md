@@ -163,7 +163,8 @@ http请求中产生两个核心对象：
 #10.14
 
 ##1.tips
-
+- annotate拓展查询字段
+- 相同英文单词换行需添加 word-break: break-all;的css属性
 - form表单提交数据会刷新页面，此时就需要使用jQuery的ajax 
 - 在前端也有json  
 

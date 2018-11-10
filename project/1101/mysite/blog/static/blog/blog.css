@@ -29,6 +29,7 @@ div.blog-message-content ul li{
 }
 div.blog-message-content div.blog-content{
     clear: both;
+    word-break: break-all;
 }
 
 div.page-bottom nav{
