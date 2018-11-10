@@ -23,7 +23,7 @@ active
                         博客内容
                     </div>
                     <div class="card-body">
-                        {% for blog in page_of_blogs %}
+                        {% for blog in context %}
                             <div class="blog-message">
                                 <a href="{% url 'blog_detail' blog.pk %}">
                                     <h3>{{ blog.title }}</h3>
@@ -94,9 +94,9 @@ active
                         </ul>
                     </nav>
                     <p>
-                        共有{{ page_of_blogs.paginator.count }}篇博客，
-                        当前第{{ page_of_blogs.number }}页，
-                        共{{ page_of_blogs.paginator.num_pages }}页
+                        共有{{ context.paginator.count }}篇博客，
+                        当前第{{ context.number }}页，
+                        共{{ context.paginator.num_pages }}页
                     </p>
                 </div>
 

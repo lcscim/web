@@ -7,8 +7,44 @@ div.blog-message+p:not(:last-child){
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
+/*div.blog-message-content{*/
+    /*margin: 0 auto;*/
+/*}*/
+@media (max-width: 950px) {
+    div.blog-message-content{
+        margin-right: 100px;
+        margin-left: 100px;
+    }
+}
+@media (min-width: 950px) {
+    div.blog-message-content{
+        margin-right: 150px;
+        margin-left: 150px;
+    }
+}
+div.blog-message-content ul li{
+    margin-right: 15px;
+    list-style-type: none;
+    float: left;
+}
+div.blog-message-content div.blog-content{
+    clear: both;
+}
 
-div.blog-message-content p:not(:last-child){
+div.page-bottom nav{
     display: inline-block;
-    margin-right: 10px;
+}
+
+div.page-bottom{
+    text-align: center;
+    margin-top: 30px;
+}
+div.blog-more{
+    display: inline-block;
+    text-align: center;
+}
+
+div.blog-more span{
+    margin-top: 1em;
+    margin-right: 3em;
 }

@@ -431,7 +431,7 @@ Django中默认的数据库是sqlite要使用MySQL需对设置进行修改
     models.Tb1.objects.filter(id__lte=10)             # 获取id小于10的值
     models.Tb1.objects.filter(id__lt=10, id__gt=1)   # 获取id大于1 且 小于10的值
 
-- in 
+- in ,not in
 
     models.Tb1.objects.filter(id__in=[11, 22, 33])   # 获取id等于11、22、33的数据
     models.Tb1.objects.exclude(id__in=[11, 22, 33])  # not in

@@ -731,7 +731,7 @@ https://www.cnblogs.com/yuanchenqi/articles/5977825.html
 		1: border:1px solid transparent
 		2:  padding:1px
 		3: over-flow:hidden; 
-##2.float属性
+##2.属性
 先来了解一下block元素和inline元素在文档流中的排列方式。
 
 　　block元素通常被现实为独立的一块，独占一行，多个block元素会各自新起一行，默认block元素宽度自动填满其父元素宽度。block元素可以设置width、height、margin、padding属性；
