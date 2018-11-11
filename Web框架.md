@@ -839,27 +839,86 @@ https://www.cnblogs.com/wupeiqi/articles/6144178.html
 			return key
 		#该方法用于获取7天阅读数据
 		def get_seven_days_read_data(content_type):
-		today = timezone.now().date()
-		read_sums=[]
-		for i in range(7,0,-1):
-			date = today-datetime.timedelta(days=i)
-			read_detail = ReadDetail.objects.filter(content_type=content_type,date=date)
-			result = read_detail.aggregate(read_num_sum=Sum('read_num'))
-			read_sums.append(result['read_num_sum'] or 0)
-		return read_sums
+		    today = timezone.now().date()
+		    read_sums=[]
+		    dates = []
+		    for i in range(7,0,-1):
+		        date = today-datetime.timedelta(days=i)
+		        dates.append(date.strftime('%m/%d'))
+		        read_detail = ReadDetail.objects.filter(content_type=content_type,date=date)
+		        result = read_detail.aggregate(read_num_sum=Sum('read_num'))
+		        read_sums.append(result['read_num_sum'] or 0)
+		    return dates,read_sums
 	- 在主页面显示阅读变化
 		from django.shortcuts import render
 		from django.contrib.contenttypes.models import ContentType
 		from read_statistics.utils import get_seven_days_read_data
 		from blog.models import Blog
-
+		
 		def home(request):
-			blog_content_type = ContentType.objects.get_for_model(Blog)
-			read_nums = get_seven_days_read_data(blog_content_type)
+		    blog_content_type = ContentType.objects.get_for_model(Blog)
+		    dates,read_nums = get_seven_days_read_data(blog_content_type)
+		    context = {}
+		    context['read_nums'] = read_nums
+		    context['dates'] = dates
+		    return render(request,'home.html',context)
+	- 对要显示在页面的数据进行可视化处理此处需要引入hcharts,官网https://www.hcharts.cn/		并修改
 
-			context = {}
-			context['read_nums'] = read_nums
-			return render(request,'home.html',context)
-	- 对要显示在页面的数据进行可视化处理此处需要引入hcharts,官网https://www.hcharts.cn/		
+		{% extends 'base.html' %}
+		{% load staticfiles %}
+		
+		{% block title %}
+		    我的网站|首页
+		{% endblock %}
+		
+		{% block header_extends %}
+		    <link rel="stylesheet" href="{% static 'home.css' %}">
+		    <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+		{% endblock %}
+		
+		{% block content %}
+		    <h3 class="home-content">欢迎访问我的网站，随便看</h3>
+		    <div id="container" style=""></div>
+		    
+		    <script>
+		        // 图表配置
+		        var options = {
+		            chart: {
+		                type: 'line'                          //指定图表的类型，默认是折线图（line）
+		            },
+		            title: {
+		                text: null                 // 标题
+		            },
+		            xAxis: {
+		                categories: {{ dates|safe }},   // x 轴分类
+		                tickmarkPlacement:'on',
+		            },
+		            yAxis: {
+		                title: {
+		                    text: null               // y 轴标题
+		                },
+		                labels:{
+		                    enabled:false   //是否显示y轴详细
+		                },
+		                gridLineDashStyle:'Dash'
+		            },
+		            series: [{                              // 数据列
+		                name: '阅读量',                        // 数据列名
+		                data: {{ read_nums|safe }},                     // 数据
+		            }],
+		            plotOptions: {      //数据标签为显示
+		                line: {
+		                    dataLabels: {
+		                        enabled: true
+		                    }
+		                }
+		            },
+		            legend: { enabled: false },     //图例
+		            credits: { enabled:false },     //版权信息
+		        };
+		        // 图表初始化函数
+		        var chart = Highcharts.chart('container', options);
+		    </script>
+		{% endblock %}		
 		
 		

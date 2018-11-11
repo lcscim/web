@@ -27,9 +27,11 @@ def read_statistics_once_read(request,obj):
 def get_seven_days_read_data(content_type):
     today = timezone.now().date()
     read_sums=[]
+    dates = []
     for i in range(7,0,-1):
         date = today-datetime.timedelta(days=i)
+        dates.append(date.strftime('%m/%d'))
         read_detail = ReadDetail.objects.filter(content_type=content_type,date=date)
         result = read_detail.aggregate(read_num_sum=Sum('read_num'))
         read_sums.append(result['read_num_sum'] or 0)
-    return read_sums
+    return dates,read_sums
