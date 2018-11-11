@@ -625,4 +625,241 @@ https://www.cnblogs.com/wupeiqi/articles/6144178.html
 
 　　python manage.py createsuperuser
 - 将Django admin改为中文在settings中改成以下内容
-	LANGUAGE_CODE = 'zh-Hans'
+	LANGUAGE_CODE = 'zh-Hans'	繁体中文
+	LANGUAGE_CODE = 'zh-hans'	简体中文
+
+- 富文本编辑django-ckediter
+
+	1. pip install django-ckeditor
+	2. 在settings文件中注册
+		'ckeditor',
+	3. 在需要进行富文本编辑的地方models文件中导入
+
+		from ckeditor.fields import RichTextField
+	4. 替换需要进行富文本编辑的编辑框
+
+	- 如果需要图片上传功能
+
+	1. 安装pillow
+		pip install pillow
+	2. 在settings注册应用
+		'ckeditor_uploader'
+	3. 配置settings，用于存储图片的路径
+		1. #配置media
+			MEDIA_URL = '/media/'
+			MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+			
+			#配置CKeditor
+			CKEDITOR_UPLOAD_PATH = 'upload/'
+		2. 创建目录
+			在根目录创建文件夹
+	4. 配置url ，在主url中
+		1. path('ckeditor',include('ckeditor_uploader.urls')),
+		2. 添加
+			from django.conf import settings
+			from django.conf.urls.static import static
+			
+			urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+	5. 修改models
+
+		from ckeditor_uploader.fields import RichTextUploadingField
+		#需要修改的文本变为
+		content=RichTextUploadingField()
+	6. 对数据库进行迁移
+		1. Python manage.py makemigrations
+		2. python manage.py migrate
+		
+	- 注意需要对显示页面进行处理，对需要显示富文本的地方使用|safe ，需要显示一段文字的地方使用|striptags
+- 简单阅读计数
+
+	1. 在models中添加字段，并同步
+		readed_num = models.IntegerField(default=0)
+	2. 在admin文件中的相应库中添加readed_num
+		list_display = ('title','blog_type','author','readed_num','created_time','last_update_time')
+	3. 修改相应视图函数
+		blog_message.readed_num += 1
+		blog_message.save()
+		#访问页面时对数据进行+1并保存
+	4. 在视图上显示
+	5. 自定义计数规则使用cookie，在视图函数中
+		blog_message=Blog.objects.filter(id=blog_pk).first()
+		#判断是否有cookie
+		if not request.COOKIES.get('blog_%s_readed'%blog_pk):
+			blog_message.readed_num += 1
+			blog_message.save()
+
+		.....
+		response = render(request, 'blog_detail.html', context)
+		#设置cookie并设置到浏览器上
+		response.set_cookie('blog_%s_readed'%blog_pk,'true')
+		return response
+- 阅读计数优化
+	1. 创建新的models类来存储计数
+		class ReadNum(models.Model):
+		read_num = models.IntegerField(default=0)
+		blog = models.OneToOneField(Blog, on_delete=models.DO_NOTHING)
+		
+		- 删除admin中的readed_num
+		- 最后同步数据
+	2. 在后台admin文件中导入包，并进行注册
+		@admin.register(ReadNum)
+		class BlogAdmin(admin.ModelAdmin):
+			list_display = ('read_num','blog')
+	3. 要在models中的blog类中添加方法并在admin文件中添加显示条目来关联
+		def read_num(self):
+			return self.readnum.read_num
+			
+		@admin.register(Blog)
+		class BlogAdmin(admin.ModelAdmin):
+			list_display = (...'read_num',...)
+	4. 在视图函数中修改判断记录
+		if not request.COOKIES.get('blog_%s_readed'%blog_pk):
+			if ReadNum.objects.filter(blog=blog_message).count()
+				#存在记录
+				readnum=ReadNum.objects.get(blog=blog_message)
+			else:
+				#不存在记录
+				readnum=ReadNum(blog=blog_message)
+			#计数加1
+			readnum.read_num += 1
+			readnum.save()
+	5. 要让没有访问的数据默认显示0，在models中修改
+		from django.db.models.fields import exceptions
+		...
+		    def get_read_num(self):
+			#当为空时会出现错误，然后对其验证
+				try:
+					return self.readnum.read_num
+				except exceptions.ObjectDoesNotExist:
+					return 0
+- 对任意模型都可计数 需要用到django.contrib.contenttypes
+	1. 新建APP模块
+		python manage.py startapp read_statistics
+	2. 在models模块中添加
+		from django.db import models
+		from django.contrib.contenttypes.fields import GenericForeignKey
+		from django.contrib.contenttypes.models import ContentType
+
+		class ReadNum(models.Model):
+			read_num = models.IntegerField(default=0)
+			content_type=models.ForeignKey(ContentType,on_delete=models.CASCADE)
+			object_id=models.PositiveIntegerField()
+			content_objct=GenericForeignKey('content_type','object_id')
+	3. 在settings文件中注册并更新数据库
+	4. 在新模块中添加
+		from django.contrib import admin
+		from .models import ReadNum
+
+		@admin.register(ReadNum)
+		class ReadNumAdmin(admin.ModelAdmin):
+			list_display = ('read_num','content_object')
+	5. 在原模块中的models文件中的对应模块添加
+		from django.contrib.contenttypes.models import ContentType
+		from read_statistics.models import ReadNum
+		...
+		    def get_read_num(self):
+			try:
+				ct = ContentType.objects.get_for_model(Blog)
+				readnum=ReadNum.objects.get(content_type=ct,object_id=self.id)
+				return readnum.read_num
+			except exceptions.ObjectDoesNotExist:
+				return 0
+	6. 在视图函数中修改判断记录
+		from django.contrib.contenttypes.models import ContentType
+		from read_statistics.models import ReadNum
+		
+		
+		...
+		    if not request.COOKIES.get('blog_%s_readed'%blog_pk):
+				ct = ContentType.objects.get_for_model(Blog)
+				if ReadNum.objects.filter(content_type=ct,object_id=blog_message.pk).count():
+					#存在记录
+					readnum=ReadNum.objects.get(content_type=ct,object_id=blog_message.pk)
+				else:
+					#不存在记录
+					readnum=ReadNum(content_type=ct,object_id=blog_message.pk)
+				#计数加1
+				readnum.read_num += 1
+				readnum.save()
+				
+- 实现阅读数每天实时显示
+
+	- 在读数 models 新建数据库
+		class ReadDetail(models.Model):
+			date = models.DateField(default=timezone.now)
+
+			read_num = models.IntegerField(default=0)
+			content_type=models.ForeignKey(ContentType,on_delete=models.DO_NOTHING)
+			object_id=models.PositiveIntegerField()
+			content_object=GenericForeignKey('content_type','object_id')
+
+	- 在APP中的admin中注册
+		@admin.register(ReadDetail)
+		class ReadDetailAdmin(admin.ModelAdmin):
+			list_display = ('date','read_num','content_object')
+	- 在utils中进行修改
+		from django.contrib.contenttypes.models import ContentType
+		from .models import ReadNum,ReadDetail
+		from django.utils import timezone
+
+		def read_statistics_once_read(request,obj):
+			ct = ContentType.objects.get_for_model(obj)
+			key = '%s_%s_read' % (ct.model,obj.pk)
+			if not request.COOKIES.get(key):
+				#方法一
+				# if ReadNum.objects.filter(content_type=ct, object_id=obj.pk).count():
+				#     # 存在记录
+				#     readnum = ReadNum.objects.get(content_type=ct, object_id=obj.pk)
+				# else:
+				#     # 不存在记录
+				#     readnum = ReadNum(content_type=ct, object_id=obj.pk)
+				# # 计数加1
+				# readnum.read_num += 1
+				# readnum.save()
+				#
+				# date = timezone.now().date()
+				# if ReadDetail.objects.filter(content_type=ct,object_id=obj.pk,date=date).count():
+				#     readDetail = ReadDetail.objects.get(content_type=ct,object_id=obj.pk,date=date)
+				# else:
+				#     readDetail = ReadDetail(content_type=ct,object_id=obj.pk,date=date)
+				# readDetail.read_num += 1
+				# readDetail.save()
+
+				#方法二
+				#总阅读数+1
+				readnum,created = ReadNum.objects.get_or_create(content_type=ct,object_id=obj.pk)
+				readnum.read_num += 1
+				readnum.save()
+				#当天阅读数+1
+				date = timezone.now().date()
+				readDetail,created = ReadDetail.objects.get_or_create(content_type=ct,object_id=obj.pk,date=date)
+				readDetail.read_num += 1
+				readDetail.save()
+
+			return key
+		#该方法用于获取7天阅读数据
+		def get_seven_days_read_data(content_type):
+		today = timezone.now().date()
+		read_sums=[]
+		for i in range(7,0,-1):
+			date = today-datetime.timedelta(days=i)
+			read_detail = ReadDetail.objects.filter(content_type=content_type,date=date)
+			result = read_detail.aggregate(read_num_sum=Sum('read_num'))
+			read_sums.append(result['read_num_sum'] or 0)
+		return read_sums
+	- 在主页面显示阅读变化
+		from django.shortcuts import render
+		from django.contrib.contenttypes.models import ContentType
+		from read_statistics.utils import get_seven_days_read_data
+		from blog.models import Blog
+
+		def home(request):
+			blog_content_type = ContentType.objects.get_for_model(Blog)
+			read_nums = get_seven_days_read_data(blog_content_type)
+
+			context = {}
+			context['read_nums'] = read_nums
+			return render(request,'home.html',context)
+	- 对要显示在页面的数据进行可视化处理此处需要引入hcharts,官网https://www.hcharts.cn/		
+		
+		

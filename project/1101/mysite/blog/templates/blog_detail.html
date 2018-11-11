@@ -22,10 +22,11 @@
             <li>分类：
                 <a href="{% url 'blogs_with_type' blog_message.blog_type.pk %}">{{ blog_message.blog_type }}</a>
             </li>
+            <li>阅读（{{ blog_message.get_read_num }}）</li>
         </ul>
 
         <div class="blog-content">
-            <p>{{ blog_message.content }}</p>
+            <p>{{ blog_message.content|safe }}</p>
         </div>
         <div class="blog-more">
             <span>
