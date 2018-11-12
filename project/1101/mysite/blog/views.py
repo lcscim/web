@@ -4,7 +4,8 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from django.db.models import Count
 from read_statistics.utils import read_statistics_once_read
-
+from django.contrib.contenttypes.models import ContentType
+from comment.models import Comment
 
 def get_page_list_common_data(request,blogs_all_list):
     pagintor = Paginator(blogs_all_list, settings.EACH_PAGE_BLOGS_NUMBER)  # 每10篇进行分页
@@ -59,13 +60,14 @@ def blog_detail(request,blog_pk):
     blog_message=Blog.objects.filter(id=blog_pk).first()
     read_cookie_key = read_statistics_once_read(request,blog_message)
 
-    previous_blog=Blog.objects.filter(created_time__gt=blog_message.created_time).last()
-    next_blog=Blog.objects.filter(created_time__lt=blog_message.created_time).first()
+    blog_content_type = ContentType.objects.get_for_model(blog_message)
+    comments = Comment.objects.filter(content_type=blog_content_type,object_id=blog_message.pk)
 
     context={}
     context['blog_message']=blog_message
-    context['previous_blog']=previous_blog
-    context['next_blog']=next_blog
+    context['comments'] = comments
+    context['previous_blog']=Blog.objects.filter(created_time__gt=blog_message.created_time).last()
+    context['next_blog']=Blog.objects.filter(created_time__lt=blog_message.created_time).first()
     response = render(request, 'blog_detail.html', context)
     response.set_cookie(read_cookie_key,'true')
     return response

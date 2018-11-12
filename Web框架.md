@@ -921,4 +921,103 @@ https://www.cnblogs.com/wupeiqi/articles/6144178.html
 		    </script>
 		{% endblock %}		
 		
+- 利用阅读量数据排行
+
+	- 今日阅读量与昨日阅读量
+		1.在utils中写入
+			def get_today_hot_data(content_type):
+				today = timezone.now().date()
+				read_datil = ReadDetail.objects.filter(content_type=content_type,date=today).order_by('-read_num')
+				return read_datil[:7]
+
+			def get_yesterday_hot_data(content_type):
+				today = timezone.now().date()
+				yesterday = today-datetime.timedelta(days=1)
+				read_datil = ReadDetail.objects.filter(content_type=content_type,date=yesterday).order_by('-read_num')
+				return read_datil[:7]
+		2.在视图函数中导入该方法并添加
+			context['today_hot_data'] = get_today_hot_data(blog_content_type)
+			context['yesterday_hot_data'] = get_yesterday_hot_data(blog_content_type)
+		3.在HTML中添加
+			<h3>今天热门博客</h3>
+			<ul>
+				{% for hot_data in today_hot_data %}
+					<li>
+						<a href="{% url 'blog_detail' hot_data.content_object.pk %}">
+							{{ hot_data.content_object.title }}
+						</a>
+						({{ hot_data.read_num }})
+					</li>
+				{% empty %}
+					<li>今天暂没有热门博客</li>
+				{% endfor %}
+
+			</ul>
+
+			<h3>昨日热门博客</h3>
+			<ul>
+				{% for hot_data in yesterday_hot_data %}
+					<li>
+						<a href="{% url 'blog_detail' hot_data.content_object.pk %}">
+							{{ hot_data.content_object.title }}
+						</a>
+						({{ hot_data.read_num }})
+					</li>
+				{% empty %}
+					<li>昨日暂没有热门博客</li>
+				{% endfor %}
+
+			</ul>
+	- 一周阅读量与一月阅读量
+		-注意需要对blog中的model进行处理
+			from django.contrib.contenttypes.fields import GenericRelation
+			在blog中加入一行
+			read_details = GenericRelation(ReadDetail)
+		1.在utils中写入
+			def get_7_days_hot_blogs():
+			today = timezone.now().date()
+			date = today - datetime.timedelta(days=7)
+			blogs = Blog.objects\
+							 .filter(read_details__date__lt=today,read_details__date__gte=date)\
+							 .values('id','title')\
+							 .annotate(read_num_sum=Sum('read_details__read_num'))\
+							 .order_by('-read_num_sum')
+			return blogs[:7]
+		2.在视图函数中导入该方法并添加
+			context['hot_blogs_for_7_days'] = hot_blogs_for_7_days
+
+		3.在HTML中添加
+			<h3>本周热门博客</h3>
+			<ul>
+				{% for hot_blog in hot_blogs_for_7_days %}
+					<li>
+						<a href="{% url 'blog_detail' hot_blog.id %}">
+							{{ hot_blog.title }}
+						</a>
+						({{ hot_blog.read_num_sum }})
+					</li>
+				{% empty %}
+					<li>本周暂没有热门博客</li>
+				{% endfor %}
+			</ul>
+	- 开启缓存数据
+		1.执行 python manage.py createcachetable
+		2.在视图函数中
+			#获取7天热门博客缓存数据
+			hot_blogs_for_7_days = cache.get('hot_blogs_for_7_days')
+			if hot_blogs_for_7_days is None:
+				hot_blogs_for_7_days = get_7_days_hot_blogs()
+				cache.set('hot_blogs_for_7_days',hot_blogs_for_7_days,3600)
+				print('calc')
+			else:
+				print('use cache')
+			修改
+			 context['hot_blogs_for_7_days'] = hot_blogs_for_7_days
+- 评论功能设计和用户登录
+	详见GitHub
+
+
+   
+
+
 		
