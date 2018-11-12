@@ -5,7 +5,8 @@ from blog.models import Blog
 from django.core.cache import cache
 from django.contrib import auth
 from django.urls import reverse
-from .forms import LoginForm
+from .forms import LoginForm,RegForm
+from django.contrib.auth.models import User
 
 def home(request):
     blog_content_type = ContentType.objects.get_for_model(Blog)
@@ -53,3 +54,21 @@ def login(request):
     context = {}
     context['login_form'] = login_form
     return render(request,'login.html',context)
+
+def register(request):
+    if request.method=='POST':
+        reg_form = RegForm(request.POST)
+        if reg_form.is_valid():
+            username = reg_form.cleaned_data['username']
+            email = reg_form.cleaned_data['email']
+            password = reg_form.cleaned_data['password']
+            user = User.objects.create_user(username,email,password)
+            user.save()
+            user = auth.authenticate(username=username,password=password)
+            auth.login(request,user)
+            return redirect(request.GET.get('from',reverse('home')))
+    else:
+        reg_form = RegForm()
+    context = {}
+    context['reg_form'] = reg_form
+    return render(request,'register.html',context)

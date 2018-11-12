@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title %}
-    我的网站|登录
+    我的网站|注册
 {% endblock %}
 
 {% block header_extends %}
@@ -25,18 +25,18 @@ active
             <div class="col-md-6 offset-md-3">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="panel-title">登录</h3>
+                        <h3 class="panel-title">注册</h3>
                     </div>
                     <div class="card-body">
                         <form action="" method="post">
                              {% csrf_token %}
-                             {% for filed in login_form %}
+                             {% for filed in reg_form %}
                                  <label for="{{ filed.id_for_label }}">{{ filed.label }}</label>
                                  {{ filed }}
-                                 <p class="test-danger">{{ filed.errors.as_text }}</p>
+                                 <p class="test-danger" style="color: red">{{ filed.errors.as_text }}</p>
                              {% endfor %}
-                             <span class="float-left text-danger">{{ login_form.non_field_errors }}</span>
-                             <input type="submit" value="提交" class="btn btn-primary float-right">
+                             <span class="float-left text-danger">{{ reg_form.non_field_errors }}</span>
+                             <input type="submit" value="注册" class="btn btn-primary float-right">
                          </form>
                     </div>
                 </div>
