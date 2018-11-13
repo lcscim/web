@@ -52,14 +52,9 @@
             {% if user.is_authenticated %}
 
                 <form action="{% url 'update_comment' %}" method="post" style="overflow: hidden">
+                    <label>{{ user.username }}欢迎评论~</label>
                     {% csrf_token %}
-                    <div class="form-group">
-                        <label for="comment_text">{{ user.username }}欢迎评论~</label>
-                        <textarea id="comment_text" name="text" class="form-control" rows="4"></textarea>
-                    </div>
-
-                    <input type="hidden" name="object_id" value="{{ blog_message.pk }}">
-                    <input type="hidden" name="content_type" value="blog">
+                    {{ comment_form }}
                     <input type="submit" value="评论" class="btn btn-primary" style="float: right">
                 </form>
             {% else %}

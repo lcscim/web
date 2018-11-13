@@ -6,6 +6,7 @@ from django.db.models import Count
 from read_statistics.utils import read_statistics_once_read
 from django.contrib.contenttypes.models import ContentType
 from comment.models import Comment
+from comment.forms import CommentForm
 
 def get_page_list_common_data(request,blogs_all_list):
     pagintor = Paginator(blogs_all_list, settings.EACH_PAGE_BLOGS_NUMBER)  # 每10篇进行分页
@@ -68,6 +69,7 @@ def blog_detail(request,blog_pk):
     context['comments'] = comments
     context['previous_blog']=Blog.objects.filter(created_time__gt=blog_message.created_time).last()
     context['next_blog']=Blog.objects.filter(created_time__lt=blog_message.created_time).first()
+    context['comment_form'] = CommentForm(initial={'content_type':blog_content_type.model,'object_id':blog_pk})
     response = render(request, 'blog_detail.html', context)
     response.set_cookie(read_cookie_key,'true')
     return response
